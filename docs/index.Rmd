@@ -1,5 +1,5 @@
 ---
-title: "Cluster Analysis - Countries from the World Happiness Report 2022"
+title: "Cluster Analysis - Countries from the 2022 World Happiness Report"
 author: "Clifford Cele"
 date: "`r Sys.Date()`"
 output:
@@ -13,44 +13,37 @@ editor_options:
 
 ## Introduction
 
-* What is WHR?
-* What are the 6 chars of WHR?
-* Basic top/btm results from 2022
+The World Happiness Report (WHR) uses survey data to describe how people evaluate their own lives in various countries around the world. Happiness is measured by asking survey participants to respond to the following question:
 
-our happiness rankings are not based on any index of these six factors—the scores are instead based on individuals’ own assessments of their lives, as revealed by their answers to the single-item Cantril ladder life-evaluation question.
+- **Happiness:** "Please imagine a ladder, with steps numbered from 0 at the bottom to 10 at the top. The top of the ladder represents the best possible life for you and the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
 
-We use observed data on the six variables and estimates of their associations with life evaluations to explain the observed variation of life evaluations across countries:
-
-<font size="2">
+The WHR uses external observational data on the following six life factors to estimate their associations with happiness and to explain the observed variation of happiness across countries.
 
 - **Gross Domestic Product (GDP) per Capita:** Purchasing Power Parity (PPP) adjusted to constant 2017 international dollars, taken from the World Development Indicators (WDI) released by the World Bank on December 16, 2021. after adjustment for population growth. The equation uses the natural log of GDP per capita, as this form fits the data significantly better than GDP per capita.
 
 - **(Healthy) Life Expectancy:** is constructed based on data from the World Health Organization (WHO) Global Health Observatory data repository, with data available for 2000, 2010, 2015, and 2019 (extrapolation to 2021). 
 
-The following items are based on the national average of the binary responses (0=no, 1=yes) to the Gallup World Poll (GWP) questions:
+The following items are based on the national average of the binary responses (No = 0, Yes = 1) to the Gallup World Poll (GWP) questions:
 
 - **Social (Support):** “If you were in trouble, do you have relatives or friends you can count on to help you whenever you need them, or not?”
 
 - **(Freedom):** “Are you satisfied or dissatisfied with your freedom to choose what you do with your life?”
 
-- **(Generosity):** “Have you donated money to a charity in the past month?” on log GDP per capita.
+- **(Generosity):** “Have you donated money to a charity in the past month?” on log GDP per Capita.
 
 - **Perceptions of (Corruption):** the average of the two GWP questions: 
   - “Is corruption widespread throughout the government in this country or not?”  
   - “Is corruption widespread within businesses in this country or not?” 
   - Perception of business corruption is used when government corruption is missing.
 
-</font>
+
+The goal of this analysis is to cluster countries into different groups based on their results from the 2022 World Happiness Report and describe how the groups differ.
 
 
-Countries with a * do not have survey results from 2020 or 2021. There averages are based on the 2019 survey.
-
-
-
-The goal of this analysis is to cluster countries into different groups based on their results from the 2022 World Happiness Report. And garner 
 
 
 ## Descriptive Statistics
+
 Figure 1 and Table 1 present the boxplot and summary statistics (respectively) of each variable from the original dataset. There are no missing data, the variables are not on same scale, and each variable contains at least one outlier. The summaries also show that the variance of `GDP` differs substantially from the other variables. As such, the data was standardized before performing the cluster analysis so that each variable has a mean of zero and standard deviation (SD) of one.
 
 The code below creates the summary statistics table in SAS.
