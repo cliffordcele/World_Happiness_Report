@@ -13,58 +13,33 @@ editor_options:
 
 ## Introduction
 
-The World Happiness Report (WHR) uses survey data to describe how people
-evaluate their own lives in various countries around the world.
-Happiness is measured by asking survey participants to respond to the
-following question:
+The World Happiness Report (WHR) uses survey data to describe how people evaluate their own lives in various countries around the world. Happiness is measured by asking survey participants to respond to the following question:
 
--   **Happiness:** "Please imagine a ladder, with steps numbered from 0
-    at the bottom to 10 at the top. The top of the ladder represents the
-    best possible life for you and the bottom of the ladder represents
-    the worst possible life for you. On which step of the ladder would
-    you say you personally feel you stand at this time?"
+-   **Happiness:** "Please imagine a ladder, with steps numbered from 0 at the bottom to 10 at the top. The top of the ladder represents the best possible life for you and the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
 
-The WHR uses external observational data on the following six life
-factors to estimate their associations with happiness and to explain the
-observed variation of happiness across countries.
+The WHR uses external observational data on the following six life factors to estimate their associations with happiness and to explain the observed variation of happiness across countries.
 
--   **Gross Domestic Product (GDP) per Capita:** Purchasing Power Parity
-    (PPP) adjusted to constant 2017 international dollars, taken from
-    the World Development Indicators (WDI) released by the World Bank on
-    December 16, 2021. after adjustment for population growth. The
-    equation uses the natural log of GDP per capita, as this form fits
-    the data significantly better than GDP per capita.
+-   **Gross Domestic Product (GDP) per Capita:** Purchasing Power Parity (PPP) adjusted to constant 2017 international dollars, taken from the World Development Indicators (WDI) released by the World Bank on December 16, 2021. after adjustment for population growth. The equation uses the natural log of GDP per capita, as this form fits the data significantly better than GDP per capita.
 
--   **(Healthy) Life Expectancy:** is constructed based on data from the
-    World Health Organization (WHO) Global Health Observatory data
-    repository, with data available for 2000, 2010, 2015, and 2019
-    (extrapolation to 2021).
+-   **(Healthy) Life Expectancy:** is constructed based on data from the World Health Organization (WHO) Global Health Observatory data repository, with data available for 2000, 2010, 2015, and 2019 (extrapolation to 2021).
 
-The following items are based on the national average of the binary
-responses (No = 0, Yes = 1) to the Gallup World Poll (GWP) questions:
+The following items are based on the national average of the binary responses (No = 0, Yes = 1) to the Gallup World Poll (GWP) questions:
 
--   **Social (Support):** "If you were in trouble, do you have relatives
-    or friends you can count on to help you whenever you need them, or
-    not?"
+-   **Social (Support):** "If you were in trouble, do you have relatives or friends you can count on to help you whenever you need them, or not?"
 
--   **(Freedom):** "Are you satisfied or dissatisfied with your freedom
-    to choose what you do with your life?"
+-   **(Freedom):** "Are you satisfied or dissatisfied with your freedom to choose what you do with your life?"
 
--   **(Generosity):** "Have you donated money to a charity in the past
-    month?" on log GDP per Capita.
+-   **(Generosity):** "Have you donated money to a charity in the past month?" on log GDP per Capita.
 
--   **Perceptions of (Corruption):** the average of the two GWP
-    questions:
+-   **Perceptions of (Corruption):** the average of the two GWP questions:
 
     -   "Is corruption widespread throughout the government in this
         country or not?"
     -   "Is corruption widespread within businesses in this country or
         not?"
-    -   Perception of business corruption is used when government
-        corruption is missing.
+    -   Perception of business corruption is used when government corruption is missing.
 
-The goal of this analysis is to cluster countries into different groups
-based on their results from the 2022 World Happiness Report and describe
+The goal of this analysis is to cluster countries into different groups based on their results from the 2022 World Happiness Report and describe
 how the groups differ.
 
 ## Descriptive Statistics
@@ -151,9 +126,9 @@ state the following:
 **Cohen J: Statistical Power Analysis for the Behavioral Sciences. 2nd
 ed. Hillsdale, NJ, Lawrence Erlbaum, 1988.**
 
--   $|r| < 0.3 →$ Weak relationship
--   $0.3 ≤ |r| ≤ 0.5 →$ Moderate relationship
--   $|r| > 0.5 →$ Strong relationship
+- |r| < 0.3 → Weak relationship
+-  0.3 ≤ |r| ≤ 0.5 → Moderate relationship
+- |r| > 0.5 → Strong relationship
 
 As such all bivariate relationships are summarized in TABLE XXX.
 
@@ -266,12 +241,7 @@ analysis results for each method.
     %mend loop;
     %loop;
 
-Figure XXX illustrates the dendrograms of the five clustering methods.
-Using the distance (height) between clusters, we can see that the
-complete and Ward's error methods suggest a solution of 3 or 4 clusters
-(perhaps 5 for the Ward's error). The single linkage noticeably suffers
-from the chaining effect, and the centroid & average methods do not
-yield clear clustering patterns.
+Figure XXX illustrates the dendrograms of the five clustering methods. Using the distance (height) between clusters, we can see that the complete and Ward's error methods suggest a solution of 4 or 5 clusters (perhaps 6 for complete linkage). The single linkage noticeably suffers from the chaining effect, and the centroid & average methods do not yield clear clustering patterns.
 
 <font size="2">
 
@@ -282,35 +252,9 @@ knitr::include_graphics(c("../Images/single_tree_new.png","../Images/complete_tr
 </font>
 
 Figure XXX plots the R<sup>2</sup> values of the different cluster
-solutions from the five methods. The Ward's error, complete, and average
-linkage methods yield much better R<sup>2</sup> values compared to the
-single linkage or the centroid methods.
+solutions from the five methods. The Ward's error, complete, and average linkage methods yield much better R<sup>2</sup> values compared to the single linkage or the centroid methods.
 
-XXX The Ward's error method seems to capture information the best with
-an R<sup>2</sup> value of about XXX0.75, 0.66, 0.50 with 10, 7, and 4
-clustersXXX, respectively. For a cluster size of 7 or above, the change
-in the R<sup>2</sup> value seems to flatten out, indicating that adding
-new clusters will only provide a small increase to the overall
-R<sup>2</sup>. For the solutions with less than 7 clusters, four
-clusters seem to result in the reasonable decrease in R<sup>2</sup>
-(R\^2 = 0.50). A 10-cluster solution also seems to be worth examining
-since this is when the RMS Standard Deviation approaches 1, which
-decreases from smaller than 1.5 with 4 clusters and 1.32 with 7 clusters
-but increases to 1.12 with 11 clusters. XXXX
-
-The complete and average linkage methods follow close behind in terms of
-the R<sup>2</sup> statistics, but the single linkage and the centroid
-methods seem to perform much worse.
-
-The R<sup>2</sup> value for complete linkage increases drastically when
-the cluster size changes from 2 to 3 and from 5 to 6. The average
-linkage has the biggest R<sup>2</sup> increase out of all methods when
-the cluster size changes from 4 to 6. A smaller increases occur at 7 to
-8.
-
-There are sharp increases in R<sup>2</sup> when the number of clusters
-increases from 9 to 10 and from 12 to 13 for the centroid method.
-However, there are no sharp increase for the single linkage method.
+The Ward's error method captures information the best with better R<sup>2</sup> values than all the other methods. At a cluster size of 4 or larger, the R<sup>2</sup> value is over 0.50 (with 4 clusters producing an R<sup>2</sup> = 0.54). This also appears to be the point where adding new clusters only provides a small increase to the overall R<sup>2</sup>. The R<sup>2</sup> value for complete linkage increases drastically when the cluster size changes from 2 to 3 and from 5 to 6. It exhibits an R<sup>2</sup> value is over 0.50 for 6 clusters, and a slower rise in this value with more clusters. The average linkage has the biggest R<sup>2</sup> increase of all methods when the cluster size changes from 4 to 6. A smaller increases occur at 7 to 8. There are sharp increases in R<sup>2</sup> when the number of clusters increases from 9 to 10 and from 12 to 13 for the centroid method. However, there are no sharp increase for the single linkage method.
 
     *Merging all output datasets for all methods into one dataset sorted by the # of clusters;
     DATA outputs; MERGE singleout completeout centroidout wardout averageout; BY _ncl_;

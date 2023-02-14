@@ -12,11 +12,11 @@
 
 <meta name="author" content="Clifford Cele" />
 
-<meta name="date" content="2023-02-13" />
+<meta name="date" content="2023-02-14" />
 
 <title>Cluster Analysis - Countries from the 2022 World Happiness Report</title>
 
-<script src="site_libs/header-attrs-2.19/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.20/header-attrs.js"></script>
 
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -132,7 +132,7 @@ a.sourceLine {
 <h1 class="title toc-ignore project-name">Cluster Analysis - Countries
 from the 2022 World Happiness Report</h1>
 <h4 class="author project-author">Clifford Cele</h4>
-<h4 class="date project-date">2023-02-13</h4>
+<h4 class="date project-date">2023-02-14</h4>
 </section>
 
 
@@ -304,12 +304,9 @@ guidelines state the following:</p>
 <p><strong>Cohen J: Statistical Power Analysis for the Behavioral
 Sciences. 2nd ed. Hillsdale, NJ, Lawrence Erlbaum, 1988.</strong></p>
 <ul>
-<li><span class="math inline">\(|r| &lt; 0.3 →\)</span> Weak
-relationship</li>
-<li><span class="math inline">\(0.3 ≤ |r| ≤ 0.5 →\)</span> Moderate
-relationship</li>
-<li><span class="math inline">\(|r| &gt; 0.5 →\)</span> Strong
-relationship</li>
+<li>|r| &lt; 0.3 → Weak relationship</li>
+<li>0.3 ≤ |r| ≤ 0.5 → Moderate relationship</li>
+<li>|r| &gt; 0.5 → Strong relationship</li>
 </ul>
 <p>As such all bivariate relationships are summarized in TABLE XXX.</p>
 <p>The strongest positive correlations are between <code>GDP</code>
@@ -510,8 +507,8 @@ analysis results for each method.</p>
 %loop;</code></pre>
 <p>Figure XXX illustrates the dendrograms of the five clustering
 methods. Using the distance (height) between clusters, we can see that
-the complete and Ward’s error methods suggest a solution of 3 or 4
-clusters (perhaps 5 for the Ward’s error). The single linkage noticeably
+the complete and Ward’s error methods suggest a solution of 4 or 5
+clusters (perhaps 6 for complete linkage). The single linkage noticeably
 suffers from the chaining effect, and the centroid &amp; average methods
 do not yield clear clustering patterns.</p>
 <p><font size="2"></p>
@@ -526,26 +523,18 @@ FIGURE XX. Cluster Dendrograms of the Five Methods.
 solutions from the five methods. The Ward’s error, complete, and average
 linkage methods yield much better R<sup>2</sup> values compared to the
 single linkage or the centroid methods.</p>
-<p>XXX The Ward’s error method seems to capture information the best
-with an R<sup>2</sup> value of about XXX0.75, 0.66, 0.50 with 10, 7, and
-4 clustersXXX, respectively. For a cluster size of 7 or above, the
-change in the R<sup>2</sup> value seems to flatten out, indicating that
-adding new clusters will only provide a small increase to the overall
-R<sup>2</sup>. For the solutions with less than 7 clusters, four
-clusters seem to result in the reasonable decrease in R<sup>2</sup> (R^2
-= 0.50). A 10-cluster solution also seems to be worth examining since
-this is when the RMS Standard Deviation approaches 1, which decreases
-from smaller than 1.5 with 4 clusters and 1.32 with 7 clusters but
-increases to 1.12 with 11 clusters. XXXX</p>
-<p>The complete and average linkage methods follow close behind in terms
-of the R<sup>2</sup> statistics, but the single linkage and the centroid
-methods seem to perform much worse.</p>
-<p>The R<sup>2</sup> value for complete linkage increases drastically
-when the cluster size changes from 2 to 3 and from 5 to 6. The average
-linkage has the biggest R<sup>2</sup> increase out of all methods when
-the cluster size changes from 4 to 6. A smaller increases occur at 7 to
-8.</p>
-<p>There are sharp increases in R<sup>2</sup> when the number of
+<p>The Ward’s error method captures information the best with better
+R<sup>2</sup> values than all the other methods. At a cluster size of 4
+or larger, the R<sup>2</sup> value is over 0.50 (with 4 clusters
+producing an R<sup>2</sup> = 0.54). This also appears to be the point
+where adding new clusters will only provide a small increase to the
+overall R<sup>2</sup>. The R<sup>2</sup> value for complete linkage
+increases drastically when the cluster size changes from 2 to 3 and from
+5 to 6. It also exhibits an R<sup>2</sup> value is over 0.50 at 6
+clusters and a slower rise in its R<sup>2</sup> values afterwards. The
+average linkage has the biggest R<sup>2</sup> increase of all methods
+when the cluster size changes from 4 to 6. A smaller increases occur at
+7 to 8. There are sharp increases in R<sup>2</sup> when the number of
 clusters increases from 9 to 10 and from 12 to 13 for the centroid
 method. However, there are no sharp increase for the single linkage
 method.</p>
