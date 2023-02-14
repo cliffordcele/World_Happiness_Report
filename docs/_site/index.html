@@ -181,8 +181,7 @@ charity in the past month?” on log GDP per Capita.</p></li>
 two GWP questions:</p>
 <ul>
 <li>“Is corruption widespread throughout the government in this country
-or not?”<br />
-</li>
+or not?”</li>
 <li>“Is corruption widespread within businesses in this country or
 not?”</li>
 <li>Perception of business corruption is used when government corruption
@@ -286,7 +285,7 @@ DATA dataset_long;
 RUN; </code></pre>
 <p>With this new dataset a boxplot can be created.</p>
 <pre><code>PROC SGPLOT DATA=dataset_long; VBOX value / GROUP=category; RUN;</code></pre>
-<font size="2">
+<p><font size="2"></p>
 <div class="figure" style="text-align: center">
 <img src="../Images/boxplot.png" alt="Figure 1. Boxplots of Each Variable Before (left) &amp; After (right) Standardization." width="49%" height="20%" /><img src="../Images/std_boxplot.png" alt="Figure 1. Boxplots of Each Variable Before (left) &amp; After (right) Standardization." width="49%" height="20%" />
 <p class="caption">
@@ -515,7 +514,7 @@ the complete and Ward’s error methods suggest a solution of 3 or 4
 clusters (perhaps 5 for the Ward’s error). The single linkage noticeably
 suffers from the chaining effect, and the centroid &amp; average methods
 do not yield clear clustering patterns.</p>
-<font size="2">
+<p><font size="2"></p>
 <div class="figure" style="text-align: center">
 <img src="../Images/single_tree_new.png" alt="FIGURE XX. Cluster Dendrograms of the Five Methods." width="35%" height="15%" /><img src="../Images/complete_tree_new.png" alt="FIGURE XX. Cluster Dendrograms of the Five Methods." width="35%" height="15%" /><img src="../Images/centroid_tree_new.png" alt="FIGURE XX. Cluster Dendrograms of the Five Methods." width="35%" height="15%" /><img src="../Images/ward_tree_new.png" alt="FIGURE XX. Cluster Dendrograms of the Five Methods." width="35%" height="15%" /><img src="../Images/average_tree_new.png" alt="FIGURE XX. Cluster Dendrograms of the Five Methods." width="35%" height="15%" />
 <p class="caption">
