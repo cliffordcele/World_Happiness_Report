@@ -135,8 +135,8 @@ With this new dataset a boxplot can be created.
 <font size="2">
 
 ```{r, echo=FALSE, out.width="49%", out.height="20%", fig.cap="Figure 1. Boxplots of Each Variable Before (left) & After (right) Standardization.", fig.show='hold', fig.align='center'}
-knitr::include_graphics(c("Images/boxplot.png",
-                          "Images/std_boxplot.png"))
+knitr::include_graphics(c("images/boxplot.png",
+                          "images/std_boxplot.png"))
 ```
 
 </font>
@@ -217,7 +217,7 @@ knitr::kable(tab, align='cccccc', caption = "Table XX. Pearson Correlation Coeff
 ```
 
 ```{r, echo=FALSE, out.width="49%", out.height="20%", fig.cap="Figure XX. Bivariate Scatter Plot.", fig.show='hold', fig.align='center'}
-knitr::include_graphics("Images/corr_plot.png", dpi = NA)
+knitr::include_graphics("images/corr_plot.png", dpi = NA)
 ```
 
 </font>
@@ -277,11 +277,11 @@ yield clear clustering patterns.
 <font size="2">
 
 ```{r, echo=FALSE, out.width="35%", out.height="15%", fig.cap="FIGURE XX. Cluster Dendrograms of the Five Methods.", fig.show='hold', fig.align='center'}
-knitr::include_graphics(c("Images/single_tree_new.png",
-                          "Images/complete_tree_new.png",
-                          "Images/centroid_tree_new.png",
-                          "Images/ward_tree_new.png",
-                          "Images/average_tree_new.png"), 
+knitr::include_graphics(c("images/single_tree_new.png",
+                          "images/complete_tree_new.png",
+                          "images/centroid_tree_new.png",
+                          "images/ward_tree_new.png",
+                          "images/average_tree_new.png"), 
                         dpi = NA)
 ```
 
@@ -322,7 +322,7 @@ are no sharp increase for the single linkage method.
         RUN;
 
 ```{r, echo=FALSE, out.width="65%", fig.cap="R<sup>2</sup> Plots for the Five Different Methods.", fig.show='hold', fig.align='center'}
-knitr::include_graphics("Images/rsq_plot.png", 
+knitr::include_graphics("images/rsq_plot.png", 
                         dpi = NA)
 ```
 
@@ -375,7 +375,7 @@ components should be extracted.
 I ALSO NEED THE EIGENVALUE TABLE PRODUCED IN SAS!!!!!!!!!!!!!!
 
 ```{r, echo=FALSE, out.width="65%", fig.cap="Scree Plot & Variance Explained per PC.", fig.show='hold', fig.align='center'}
-knitr::include_graphics("Images/PCA_scree_plot.png")
+knitr::include_graphics("images/PCA_scree_plot.png")
 ```
 
 #### K-Means on PC Scores
