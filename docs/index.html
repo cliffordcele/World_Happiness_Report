@@ -155,10 +155,49 @@ from the 2022 World Happiness Report</h1>
 </section>
 
 
+<div id="TOC" class="toc">
+<div class="toc-box">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#exploratory-data-analysis" id="toc-exploratory-data-analysis">Exploratory Data Analysis</a>
+<ul>
+<li><a href="#summary-statistics" id="toc-summary-statistics">Summary
+Statistics</a></li>
+<li><a href="#boxplot" id="toc-boxplot">Boxplot</a></li>
+<li><a href="#correlation-analysis" id="toc-correlation-analysis">Correlation Analysis</a></li>
+</ul></li>
+<li><a href="#assumptions" id="toc-assumptions">Assumptions</a></li>
+<li><a href="#agglomerative-hierarchical-clustering" id="toc-agglomerative-hierarchical-clustering">Agglomerative
+Hierarchical Clustering</a>
+<ul>
+<li><a href="#methods" id="toc-methods">Methods</a></li>
+<li><a href="#interpretation" id="toc-interpretation">Interpretation</a></li>
+</ul></li>
+<li><a href="#k-means-clustering" id="toc-k-means-clustering">K-Means
+Clustering</a>
+<ul>
+<li><a href="#methods-1" id="toc-methods-1">Methods</a>
+<ul>
+<li><a href="#principal-component-analysis" id="toc-principal-component-analysis">Principal Component
+Analysis</a></li>
+<li><a href="#k-means-on-pc-scores" id="toc-k-means-on-pc-scores">K-Means on PC Scores</a></li>
+</ul></li>
+<li><a href="#interpretation-1" id="toc-interpretation-1">Interpretation</a></li>
+</ul></li>
+<li><a href="#conclusion" id="toc-conclusion">Conclusion</a>
+<ul>
+<li><a href="#new-styles" id="toc-new-styles">New Styles</a></li>
+<li><a href="#your-familiar-tools" id="toc-your-familiar-tools">Your
+Familiar Tools</a></li>
+<li><a href="#stay-tuned" id="toc-stay-tuned">Stay Tuned</a></li>
+</ul></li>
+</ul>
+</div>
+</div>
 
 <section class="main-content">
-<div id="introduction" class="section level2">
-<h2>Introduction</h2>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
 <p>The World Happiness Report (WHR) uses survey data to describe how
 people evaluate their own lives in various countries around the world.
 Happiness is measured by asking survey participants to respond to the
@@ -211,8 +250,10 @@ is missing.</li>
 groups based on their results from the 2022 World Happiness Report and
 describe how the groups differ.</p>
 </div>
-<div id="descriptive-statistics" class="section level2">
-<h2>Descriptive Statistics</h2>
+<div id="exploratory-data-analysis" class="section level1">
+<h1>Exploratory Data Analysis</h1>
+<div id="summary-statistics" class="section level2">
+<h2>Summary Statistics</h2>
 <p>Figure 1 and Table 1 present the boxplot and summary statistics
 (respectively) of each variable from the original dataset. There are no
 missing data, the variables are not on same scale, and each variable
@@ -284,6 +325,9 @@ Variable.</caption>
 <pre><code>    PROC STDIZE DATA=dataset OUT=dataset_std METHOD=std;
         VAR GDP Support Healthy Freedom Generosity Corruption;
     RUN;</code></pre>
+</div>
+<div id="boxplot" class="section level2">
+<h2>Boxplot</h2>
 <p>To create the boxplot, the wide dataset was transposed into a long
 dataset based on the happiness rank and the long &amp; short names of
 each country. The indices of interest are collected into the variable
@@ -313,8 +357,9 @@ Standardization.
 </p>
 </div>
 <p></font></p>
-<div id="correlation-analysis" class="section level3">
-<h3>Correlation Analysis</h3>
+</div>
+<div id="correlation-analysis" class="section level2">
+<h2>Correlation Analysis</h2>
 <p>The pearson correlation (r) matrix and bivariate scatter plots are
 also analyzed to see if any there are any significant correlations
 between the variables of interest. Although there are no universal rules
@@ -483,14 +528,14 @@ Figure XX. Bivariate Scatter Plot.
 <p></font></p>
 </div>
 </div>
-<div id="assumptions" class="section level2">
-<h2>Assumptions</h2>
+<div id="assumptions" class="section level1">
+<h1>Assumptions</h1>
 <p>The Euclidean distance is for each cluster analysis method.</p>
 </div>
-<div id="agglomerative-hierarchical-clustering" class="section level2">
-<h2>Agglomerative Hierarchical Clustering</h2>
-<div id="methods" class="section level3">
-<h3>Methods</h3>
+<div id="agglomerative-hierarchical-clustering" class="section level1">
+<h1>Agglomerative Hierarchical Clustering</h1>
+<div id="methods" class="section level2">
+<h2>Methods</h2>
 <p>This clustering method starts by defining each data point as a
 cluster. Then, the two closest clusters are combined into a new cluster.
 In each subsequent step, two existing clusters are merged into a single
@@ -576,16 +621,16 @@ R<sup>2</sup> Plots for the Five Different Methods.
 </p>
 </div>
 </div>
-<div id="interpretation" class="section level3">
-<h3>Interpretation</h3>
+<div id="interpretation" class="section level2">
+<h2>Interpretation</h2>
 </div>
 </div>
-<div id="k-means" class="section level2">
-<h2>K-Means</h2>
-<div id="methods-1" class="section level3">
-<h3>Methods</h3>
-<div id="pca" class="section level4">
-<h4>PCA</h4>
+<div id="k-means-clustering" class="section level1">
+<h1>K-Means Clustering</h1>
+<div id="methods-1" class="section level2">
+<h2>Methods</h2>
+<div id="principal-component-analysis" class="section level3">
+<h3>Principal Component Analysis</h3>
 <p>Since several variables are correlated with one another, the typical
 measures used to evaluate the k-means clustering models, i.e., the Cubic
 Clustering Criterion (CCC) and overall R<sup>2</sup>, cannot be used. To
@@ -626,16 +671,16 @@ Scree Plot &amp; Variance Explained per PC.
 </p>
 </div>
 </div>
-<div id="k-means-on-pc-scores" class="section level4">
-<h4>K-Means on PC Scores</h4>
+<div id="k-means-on-pc-scores" class="section level3">
+<h3>K-Means on PC Scores</h3>
 </div>
 </div>
-<div id="interpretation-1" class="section level3">
-<h3>Interpretation</h3>
+<div id="interpretation-1" class="section level2">
+<h2>Interpretation</h2>
 </div>
 </div>
-<div id="conclusion" class="section level2">
-<h2>Conclusion</h2>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
 <p>Discuss which model chosen and why</p>
 <p><code>html_pretty</code> in the <a href="https://github.com/yixuan/prettydoc/"><strong>prettydoc</strong></a>
 package is a new output format for creating HTML documents from R
@@ -643,7 +688,6 @@ Markdown files. <code>html_pretty</code> is more lightweight compared to
 <code>html_document</code>, and is more stylish than
 <code>html_vignette</code> when creating package vignettes.</p>
 <pre><code>library(SASmarkdown)</code></pre>
-</div>
 <div id="new-styles" class="section level2">
 <h2>New Styles</h2>
 <p><code>html_pretty</code> currently supports three page themes
@@ -773,6 +817,7 @@ tables, e.g. using <code>knitr::kable()</code>.</p>
 <p>Please visit the <a href="https://github.com/yixuan/prettydoc/">development page</a> of the
 <code>prettydoc</code> package for latest updates and news. Comments,
 bug reports and pull requests are always welcome.</p>
+</div>
 </div>
 <div class="footnotes footnotes-end-of-document">
 <hr />

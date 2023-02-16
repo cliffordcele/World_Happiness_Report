@@ -4,6 +4,7 @@ author: "Clifford Cele"
 date: "`r Sys.Date()`"
 output:
   prettydoc::html_pretty:
+    toc: true
     theme: cayman
     highlight: github
 editor_options: 
@@ -11,7 +12,7 @@ editor_options:
     wrap: 72
 ---
 
-## Introduction
+# Introduction
 
 The World Happiness Report (WHR) uses survey data to describe how people
 evaluate their own lives in various countries around the world.
@@ -67,7 +68,9 @@ The goal of this analysis is to cluster countries into different groups
 based on their results from the 2022 World Happiness Report and describe
 how the groups differ.
 
-## Descriptive Statistics
+# Exploratory Data Analysis
+
+## Summary Statistics
 
 Figure 1 and Table 1 present the boxplot and summary statistics
 (respectively) of each variable from the original dataset. There are no
@@ -108,6 +111,8 @@ The following code is used to standardize the data.
             VAR GDP Support Healthy Freedom Generosity Corruption;
         RUN;
 
+## Boxplot
+
 To create the boxplot, the wide dataset was transposed into a long
 dataset based on the happiness rank and the long & short names of each
 country. The indices of interest are collected into the variable
@@ -141,7 +146,7 @@ knitr::include_graphics(c("images/boxplot.png",
 
 </font>
 
-### Correlation Analysis
+## Correlation Analysis
 
 The pearson correlation (r) matrix and bivariate scatter plots are also
 analyzed to see if any there are any significant correlations between
@@ -222,13 +227,13 @@ knitr::include_graphics("images/corr_plot.png", dpi = NA)
 
 </font>
 
-## Assumptions
+# Assumptions
 
 The Euclidean distance is for each cluster analysis method.
 
-## Agglomerative Hierarchical Clustering
+# Agglomerative Hierarchical Clustering
 
-### Methods
+## Methods
 
 This clustering method starts by defining each data point as a cluster.
 Then, the two closest clusters are combined into a new cluster. In each
@@ -326,13 +331,13 @@ knitr::include_graphics("images/rsq_plot.png",
                         dpi = NA)
 ```
 
-### Interpretation
+## Interpretation
 
-## K-Means
+# K-Means Clustering
 
-### Methods
+## Methods
 
-#### PCA
+### Principal Component Analysis
 
 Since several variables are correlated with one another, the typical
 measures used to evaluate the k-means clustering models, i.e., the Cubic
@@ -378,11 +383,11 @@ I ALSO NEED THE EIGENVALUE TABLE PRODUCED IN SAS!!!!!!!!!!!!!!
 knitr::include_graphics("images/PCA_scree_plot.png")
 ```
 
-#### K-Means on PC Scores
+### K-Means on PC Scores
 
-### Interpretation
+## Interpretation
 
-## Conclusion
+# Conclusion
 
 Discuss which model chosen and why
 
