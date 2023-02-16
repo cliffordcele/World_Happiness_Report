@@ -12,7 +12,7 @@
 
 <meta name="author" content="Clifford Cele" />
 
-<meta name="date" content="2023-02-14" />
+<meta name="date" content="2023-02-15" />
 
 <title>Cluster Analysis - Countries from the 2022 World Happiness Report</title>
 
@@ -132,7 +132,7 @@ a.sourceLine {
 <h1 class="title toc-ignore project-name">Cluster Analysis - Countries
 from the 2022 World Happiness Report</h1>
 <h4 class="author project-author">Clifford Cele</h4>
-<h4 class="date project-date">2023-02-14</h4>
+<h4 class="date project-date">2023-02-15</h4>
 </section>
 
 
@@ -203,9 +203,9 @@ such, the data was standardized before performing the cluster analysis
 so that each variable has a mean of zero and standard deviation (SD) of
 one.</p>
 <p>The code below creates the summary statistics table in SAS.</p>
-<pre><code>PROC MEANS DATA=dataset MEAN STD VAR NMISS N maxdec=2;
-    VAR GDP Support Healthy Freedom Generosity Corruption;
-RUN;</code></pre>
+<pre><code>    PROC MEANS DATA=dataset MEAN STD VAR NMISS N maxdec=2;
+        VAR GDP Support Healthy Freedom Generosity Corruption;
+    RUN;</code></pre>
 <p><font size="2"></p>
 <table>
 <caption>Table 1. Mean, Standard Deviation (SD), &amp; Variance of Each
@@ -262,32 +262,32 @@ Variable.</caption>
 </table>
 <p></font></p>
 <p>The following code is used to standardize the data.</p>
-<pre><code>PROC STDIZE DATA=dataset OUT=dataset_std METHOD=std;
-    VAR GDP Support Healthy Freedom Generosity Corruption;
-RUN;</code></pre>
+<pre><code>    PROC STDIZE DATA=dataset OUT=dataset_std METHOD=std;
+        VAR GDP Support Healthy Freedom Generosity Corruption;
+    RUN;</code></pre>
 <p>To create the boxplot, the wide dataset was transposed into a long
 dataset based on the happiness rank and the long &amp; short names of
 each country. The indices of interest are collected into the variable
 <code>category</code>, and their associated value per country is under
 the <code>value</code> variable.</p>
-<pre><code>PROC TRANSPOSE DATA=dataset_std OUT=dataset_long;
-   VAR Happiness GDP Support Healthy Freedom Generosity Corruption;
-   BY  Rank Country CNTRY;
-RUN;
+<pre><code>    PROC TRANSPOSE DATA=dataset_std OUT=dataset_long;
+       VAR Happiness GDP Support Healthy Freedom Generosity Corruption;
+       BY  Rank Country CNTRY;
+    RUN;
 
 
-DATA dataset_long;
-  SET  dataset_long (RENAME=(col1=value));
-  SET  dataset_long (RENAME=(_LABEL_=category));
-  DROP COL1;
-  DROP _name_;
-  DROP _LABEL_;
-RUN; </code></pre>
+    DATA dataset_long;
+      SET  dataset_long (RENAME=(col1=value));
+      SET  dataset_long (RENAME=(_LABEL_=category));
+      DROP COL1;
+      DROP _name_;
+      DROP _LABEL_;
+    RUN; </code></pre>
 <p>With this new dataset a boxplot can be created.</p>
-<pre><code>PROC SGPLOT DATA=dataset_long; VBOX value / GROUP=category; RUN;</code></pre>
+<pre><code>    PROC SGPLOT DATA=dataset_long; VBOX value / GROUP=category; RUN;</code></pre>
 <p><font size="2"></p>
 <div class="figure" style="text-align: center">
-<img src="../Images/boxplot.png" alt="Figure 1. Boxplots of Each Variable Before (left) &amp; After (right) Standardization." width="49%" height="20%" /><img src="../Images/std_boxplot.png" alt="Figure 1. Boxplots of Each Variable Before (left) &amp; After (right) Standardization." width="49%" height="20%" />
+<img src="images/boxplot.png" alt="Figure 1. Boxplots of Each Variable Before (left) &amp; After (right) Standardization." width="49%" height="20%" /><img src="images/std_boxplot.png" alt="Figure 1. Boxplots of Each Variable Before (left) &amp; After (right) Standardization." width="49%" height="20%" />
 <p class="caption">
 Figure 1. Boxplots of Each Variable Before (left) &amp; After (right)
 Standardization.
@@ -367,14 +367,14 @@ other indicators of happiness).</p>
 </tbody>
 </table>
 <p></font></p>
-<pre><code>PROC CORR DATA=dataset_std;
-    VAR GDP Support Healthy Freedom Generosity Corruption;
-RUN;
+<pre><code>    PROC CORR DATA=dataset_std;
+        VAR GDP Support Healthy Freedom Generosity Corruption;
+    RUN;
 
-PROC SGSCATTER DATA=dataset_std;
-   MATRIX GDP Support Healthy Freedom Generosity Corruption / 
-   DIAGONAL=(KERNEL HISTOGRAM);
-RUN;</code></pre>
+    PROC SGSCATTER DATA=dataset_std;
+       MATRIX GDP Support Healthy Freedom Generosity Corruption / 
+       DIAGONAL=(KERNEL HISTOGRAM);
+    RUN;</code></pre>
 <p><font size="2"></p>
 <table>
 <caption>Table XX. Pearson Correlation Coefficient Matrix.</caption>
@@ -456,7 +456,7 @@ RUN;</code></pre>
 </tbody>
 </table>
 <div class="figure" style="text-align: center">
-<img src="../Images/corr_plot.png" alt="Figure XX. Bivariate Scatter Plot." width="49%" height="20%" />
+<img src="images/corr_plot.png" alt="Figure XX. Bivariate Scatter Plot." width="49%" height="20%" />
 <p class="caption">
 Figure XX. Bivariate Scatter Plot.
 </p>
@@ -481,30 +481,30 @@ Linkage, 3) Centroid Method, 4) Average Linkage, and 5) Ward’s
 Error.</p>
 <p>The SAS macro below is used to conduct the clustering and create the
 dendrogram (tree) plots shown in FIGUREXXX.</p>
-<pre><code>%MACRO AgglomCluster(ds, clustMethod, OutName);
-    PROC CLUSTER DATA=&amp;ds METHOD=&amp;clustMethod RSQ NOSQUARE NONORM NOEIGEN out=&amp;OutName; 
-        VAR Happiness GDP Support Healthy Freedom Generosity Corruption; 
-        ID CNTRY; 
-    PROC SORT; BY _ncl_;
-    
-    PROC TREE DATA=&amp;OutName; ID CNTRY;                   * Create dendrograms;
-    DATA &amp;OutName; SET &amp;OutName; &amp;clustMethod = _rsq_;   * Adding R sq values for each method to new variable;
-    RUN;
-%MEND AgglomCluster;</code></pre>
+<pre><code>    %MACRO AgglomCluster(ds, clustMethod, OutName);
+        PROC CLUSTER DATA=&amp;ds METHOD=&amp;clustMethod RSQ NOSQUARE NONORM NOEIGEN out=&amp;OutName; 
+            VAR Happiness GDP Support Healthy Freedom Generosity Corruption; 
+            ID CNTRY; 
+        PROC SORT; BY _ncl_;
+        
+        PROC TREE DATA=&amp;OutName; ID CNTRY;                   * Create dendrograms;
+        DATA &amp;OutName; SET &amp;OutName; &amp;clustMethod = _rsq_;   * Adding R sq values for each method to new variable;
+        RUN;
+    %MEND AgglomCluster;</code></pre>
 <p>The %AgglomCluster macro above is wrapped into the macro below which
 allows one to loop through each distance method and obtain the cluster
 analysis results for each method.</p>
-<pre><code>%let param1 = single    complete    centroid    ward    average;     * distance method options;
-%let param2 = singleout completeout centroidout wardout averageout;  * Cluster analysis output datasets;
-%macro loop();
-    %do i=1 %to %sysfunc(countw(&amp;param1,%str( )));
-        %let thisparam1=%scan(&amp;param1,&amp;i,%str( ));
-        %let thisparam2=%scan(&amp;param2,&amp;i,%str( ));
-        %put &amp;thisparam1 &amp;thisparam2;
-        %AgglomCluster(dataset_std, &amp;thisparam1, &amp;thisparam2);
-    %end;
-%mend loop;
-%loop;</code></pre>
+<pre><code>    %let param1 = single    complete    centroid    ward    average;     * distance method options;
+    %let param2 = singleout completeout centroidout wardout averageout;  * Cluster analysis output datasets;
+    %macro loop();
+        %do i=1 %to %sysfunc(countw(&amp;param1,%str( )));
+            %let thisparam1=%scan(&amp;param1,&amp;i,%str( ));
+            %let thisparam2=%scan(&amp;param2,&amp;i,%str( ));
+            %put &amp;thisparam1 &amp;thisparam2;
+            %AgglomCluster(dataset_std, &amp;thisparam1, &amp;thisparam2);
+        %end;
+    %mend loop;
+    %loop;</code></pre>
 <p>Figure XXX illustrates the dendrograms of the five clustering
 methods. Using the distance (height) between clusters, we can see that
 the complete and Ward’s error methods suggest a solution of 4 or 5
@@ -513,7 +513,7 @@ suffers from the chaining effect, and the centroid &amp; average methods
 do not yield clear clustering patterns.</p>
 <p><font size="2"></p>
 <div class="figure" style="text-align: center">
-<img src="../Images/single_tree_new.png" alt="FIGURE XX. Cluster Dendrograms of the Five Methods." width="35%" height="15%" /><img src="../Images/complete_tree_new.png" alt="FIGURE XX. Cluster Dendrograms of the Five Methods." width="35%" height="15%" /><img src="../Images/centroid_tree_new.png" alt="FIGURE XX. Cluster Dendrograms of the Five Methods." width="35%" height="15%" /><img src="../Images/ward_tree_new.png" alt="FIGURE XX. Cluster Dendrograms of the Five Methods." width="35%" height="15%" /><img src="../Images/average_tree_new.png" alt="FIGURE XX. Cluster Dendrograms of the Five Methods." width="35%" height="15%" />
+<img src="images/single_tree_new.png" alt="FIGURE XX. Cluster Dendrograms of the Five Methods." width="35%" height="15%" /><img src="images/complete_tree_new.png" alt="FIGURE XX. Cluster Dendrograms of the Five Methods." width="35%" height="15%" /><img src="images/centroid_tree_new.png" alt="FIGURE XX. Cluster Dendrograms of the Five Methods." width="35%" height="15%" /><img src="images/ward_tree_new.png" alt="FIGURE XX. Cluster Dendrograms of the Five Methods." width="35%" height="15%" /><img src="images/average_tree_new.png" alt="FIGURE XX. Cluster Dendrograms of the Five Methods." width="35%" height="15%" />
 <p class="caption">
 FIGURE XX. Cluster Dendrograms of the Five Methods.
 </p>
@@ -527,32 +527,31 @@ single linkage or the centroid methods.</p>
 R<sup>2</sup> values than all the other methods. At a cluster size of 4
 or larger, the R<sup>2</sup> value is over 0.50 (with 4 clusters
 producing an R<sup>2</sup> = 0.54). This also appears to be the point
-where adding new clusters will only provide a small increase to the
-overall R<sup>2</sup>. The R<sup>2</sup> value for complete linkage
-increases drastically when the cluster size changes from 2 to 3 and from
-5 to 6. It also exhibits an R<sup>2</sup> value is over 0.50 at 6
-clusters and a slower rise in its R<sup>2</sup> values afterwards. The
-average linkage has the biggest R<sup>2</sup> increase of all methods
-when the cluster size changes from 4 to 6. A smaller increases occur at
-7 to 8. There are sharp increases in R<sup>2</sup> when the number of
-clusters increases from 9 to 10 and from 12 to 13 for the centroid
-method. However, there are no sharp increase for the single linkage
-method.</p>
-<pre><code>*Merging all output datasets for all methods into one dataset sorted by the # of clusters;
-DATA outputs; MERGE singleout completeout centroidout wardout averageout; BY _ncl_;
-DATA outputs; SET outputs; IF _ncl_ &lt;20;
+where adding new clusters only provides a small increase to the overall
+R<sup>2</sup>. The R<sup>2</sup> value for complete linkage increases
+drastically when the cluster size changes from 2 to 3 and from 5 to 6.
+It exhibits an R<sup>2</sup> value is over 0.50 for 6 clusters, and a
+slower rise in this value with more clusters. The average linkage has
+the biggest R<sup>2</sup> increase of all methods when the cluster size
+changes from 4 to 6. A smaller increases occur at 7 to 8. There are
+sharp increases in R<sup>2</sup> when the number of clusters increases
+from 9 to 10 and from 12 to 13 for the centroid method. However, there
+are no sharp increase for the single linkage method.</p>
+<pre><code>    *Merging all output datasets for all methods into one dataset sorted by the # of clusters;
+    DATA outputs; MERGE singleout completeout centroidout wardout averageout; BY _ncl_;
+    DATA outputs; SET outputs; IF _ncl_ &lt;20;
 
-symbol1 i = join v = S l = 1  c = gray; 
-symbol2 i = join v = P l = 5  c = blue;
-symbol3 i = join v = C l = 10 c = orange; 
-symbol4 i = join v = W l = 15 c = red;
-symbol5 i = join v = A l = 20 c = CX00FF00;
+    symbol1 i = join v = S l = 1  c = gray; 
+    symbol2 i = join v = P l = 5  c = blue;
+    symbol3 i = join v = C l = 10 c = orange; 
+    symbol4 i = join v = W l = 15 c = red;
+    symbol5 i = join v = A l = 20 c = CX00FF00;
 
-PROC GPLOT DATA = outputs;
-PLOT single*_ncl_=1 complete*_ncl_=2 centroid*_ncl_=3 ward*_ncl_=4 average*_ncl_=5 /OVERLAY LEGEND;
-RUN;</code></pre>
+    PROC GPLOT DATA = outputs;
+    PLOT single*_ncl_=1 complete*_ncl_=2 centroid*_ncl_=3 ward*_ncl_=4 average*_ncl_=5 /OVERLAY LEGEND;
+    RUN;</code></pre>
 <div class="figure" style="text-align: center">
-<img src="../Images/rsq_plot.png" alt="R&lt;sup&gt;2&lt;/sup&gt; Plots for the Five Different Methods." width="65%" />
+<img src="images/rsq_plot.png" alt="R&lt;sup&gt;2&lt;/sup&gt; Plots for the Five Different Methods." width="65%" />
 <p class="caption">
 R<sup>2</sup> Plots for the Five Different Methods.
 </p>
@@ -566,11 +565,51 @@ R<sup>2</sup> Plots for the Five Different Methods.
 <h2>K-Means</h2>
 <div id="methods-1" class="section level3">
 <h3>Methods</h3>
+<div id="pca" class="section level4">
+<h4>PCA</h4>
 <p>Since several variables are correlated with one another, the typical
 measures used to evaluate the k-means clustering models, i.e., the Cubic
-Clustering Criterion (CCC) and overall R[^2], cannot be used. To use
-them, a principal component analysis (PCA) must be performed to obtain
-orthogonal axes before conducting the k-means cluster analysis.</p>
+Clustering Criterion (CCC) and overall R<sup>2</sup>, cannot be used. To
+use them, a principal component analysis (PCA) must be performed to
+obtain orthogonal axes before conducting the k-means cluster
+analysis.</p>
+<p>Steps:</p>
+<ol style="list-style-type: decimal">
+<li>Compute the correlation matrix of the observational data (see Figure
+XXX).</li>
+<li>Compute the eigenvalues and eigenvectors.</li>
+<li>Determine the number of components to extract.</li>
+</ol>
+<p>The Kaiser rule indicates to retain PCs whose eigenvalues are greater
+than one. In this case, the eigenvalues of the first two components are
+larger than one.</p>
+<p>The largest component explains 50.67% of the total variance in the
+data, and the second largest component 19.72%. In total, 70.39% of the
+total variance in the data can be explained by the two components.</p>
+<p>In the scree plot (Figure XXX), the “elbow” can be located at the
+position of the second largest eigenvalue, suggesting the first two
+components should be extracted.</p>
+<!--![Scree Plot & Variance Explained per PC](images/PCA_scree_plot.png)-->
+<pre><code>    PROC PRINCOMP DATA=dataset_std OUT=dataset_PCA;
+        VAR GDP Support Healthy Freedom Generosity Corruption;
+    RUN;
+
+    * Calculate the structual loads to interpret new PC axes;
+    PROC CORR noprob nosimple;
+        VAR  GDP   Support Healthy Freedom Generosity Corruption;
+        WITH Prin1 Prin2   Prin3   Prin4   Prin5      Prin6;
+    RUN;</code></pre>
+<p>I ALSO NEED THE EIGENVALUE TABLE PRODUCED IN SAS!!!!!!!!!!!!!!</p>
+<div class="figure" style="text-align: center">
+<img src="images/PCA_scree_plot.png" alt="Scree Plot &amp; Variance Explained per PC." width="65%" />
+<p class="caption">
+Scree Plot &amp; Variance Explained per PC.
+</p>
+</div>
+</div>
+<div id="k-means-on-pc-scores" class="section level4">
+<h4>K-Means on PC Scores</h4>
+</div>
 </div>
 <div id="interpretation-1" class="section level3">
 <h3>Interpretation</h3>
@@ -594,22 +633,22 @@ Markdown files. <code>html_pretty</code> is more lightweight compared to
 and two syntax highlight styles (<code>github</code> and
 <code>vignette</code>). The theme and highlight styles can be specified
 in the document metadata, for example:</p>
-<div class="sourceCode" id="cb10"><pre
-class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">output</span><span class="kw">:</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="at">  prettydoc:</span><span class="fu">:html_pretty</span><span class="kw">:</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">theme</span><span class="kw">:</span><span class="at"> architect</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">highlight</span><span class="kw">:</span><span class="at"> github</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">output</span><span class="kw">:</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="at">  prettydoc:</span><span class="fu">:html_pretty</span><span class="kw">:</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">theme</span><span class="kw">:</span><span class="at"> architect</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">highlight</span><span class="kw">:</span><span class="at"> github</span></span></code></pre></div>
 </div>
 <div id="your-familiar-tools" class="section level2">
 <h2>Your Familiar Tools</h2>
 <p>Feel free to use the <code>knitr</code> infrastructure with dozens of
 tunable options in your document.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>x1  <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(n), <span class="at">ncol =</span> <span class="dv">2</span>)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>x2  <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">3</span>, <span class="at">sd =</span> <span class="fl">1.5</span>), <span class="at">ncol =</span> <span class="dv">2</span>)</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>x   <span class="ot">&lt;-</span> <span class="fu">rbind</span>(x1, x2)</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(x)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>x1  <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(n), <span class="at">ncol =</span> <span class="dv">2</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>x2  <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">3</span>, <span class="at">sd =</span> <span class="fl">1.5</span>), <span class="at">ncol =</span> <span class="dv">2</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>x   <span class="ot">&lt;-</span> <span class="fu">rbind</span>(x1, x2)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(x)</span></code></pre></div>
 <pre><code>##             [,1]        [,2]
 ## [1,] -0.56047565 -0.60189285
 ## [2,] -0.23017749 -0.99369859
@@ -617,16 +656,16 @@ tunable options in your document.</p>
 ## [4,]  0.07050839  0.75106130
 ## [5,]  0.12928774 -1.50916654
 ## [6,]  1.71506499 -0.09514745</code></pre>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">smoothScatter</span>(x, <span class="at">xlab =</span> <span class="st">&quot;x1&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;x2&quot;</span>)</span></code></pre></div>
-<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">smoothScatter</span>(x, <span class="at">xlab =</span> <span class="st">&quot;x1&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;x2&quot;</span>)</span></code></pre></div>
+<p><img src="index_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /></p>
 <p>You can include code snippets of languages other than R, but note
 that the block header has no curly brackets around the language
 name.</p>
-<div class="sourceCode" id="cb14"><pre
-class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>NumericVector timesTwo<span class="op">(</span>NumericVector x<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x <span class="op">*</span> <span class="dv">2</span><span class="op">;</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>NumericVector timesTwo<span class="op">(</span>NumericVector x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x <span class="op">*</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>You can also write math expressions, e.g. <span
 class="math inline">\(Y = X\beta + \epsilon\)</span>, footnotes<a
 href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>, and
