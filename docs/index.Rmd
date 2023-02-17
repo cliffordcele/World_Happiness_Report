@@ -69,7 +69,9 @@ The goal of this analysis is to cluster countries into different groups
 based on their results from the 2022 World Happiness Report and describe
 how the groups differ from one another.
 
+
 # Exploratory Data Analysis
+
 
 ## Summary Statistics
 
@@ -79,38 +81,29 @@ missing data, the variables are not on same scale, and each variable
 contains at least one outlier. The summaries also show that the variance
 of `GDP` differs substantially from the other variables. As such, the
 data was standardized before performing the cluster analysis so that
-each variable has a mean of zero and standard deviation (SD) of one.
+each variable has a mean of zero and standard deviation (Std Dev) of one.
 
 The code below creates the summary statistics table in SAS.
 
-        PROC MEANS DATA=dataset MEAN STD VAR NMISS N maxdec=2;
-            VAR GDP Support Healthy Freedom Generosity Corruption;
-        RUN;
-
-<font size="2">
-
-```{r, echo=FALSE, results='asis'}
-
-tab <- matrix(c(1.41,	0.91,	0.59,	0.52,	0.15,	0.15,
-                0.42,	0.28,	0.18,	0.15,	0.08,	0.13,
-                0.18,	0.08,	0.03,	0.02,	0.01,	0.02), 
-              ncol=6, byrow=TRUE)
-
-colnames(tab) <- c('GDP','Support','Healthy','Freedom','Generosity','Corruption')
-rownames(tab) <- c('Mean','SD','Variance')
-
-tab <- as.table(tab)
-
-knitr::kable(tab, align='cccccc', caption = "Table 1. Mean, Standard Deviation (SD), & Variance of Each Variable.")
 ```
-
+PROC MEANS DATA=dataset MEAN STD VAR NMISS N maxdec=2;
+  VAR GDP Support Healthy Freedom Generosity Corruption;
+RUN;
+```
+<font size="2">
+```{r, echo=FALSE, out.width="35%", fig.cap="Table 1. Summary Statistics & Counts (N).", fig.show='hold', fig.align='center'}
+knitr::include_graphics("images/summary_stats.png")
+```
 </font>
 
-The following code is used to standardize the data.
 
-        PROC STDIZE DATA=dataset OUT=dataset_std METHOD=std;
-            VAR GDP Support Healthy Freedom Generosity Corruption;
-        RUN;
+The following code is used to standardize the data.
+```
+PROC STDIZE DATA=dataset OUT=dataset_std METHOD=std;
+  VAR GDP Support Healthy Freedom Generosity Corruption;
+RUN;
+```
+
 
 ## Boxplots
 
@@ -119,86 +112,85 @@ dataset based on the happiness rank and the long & short names of each
 country. The indices of interest are collected into the variable
 `category`, and their associated value per country is under the `value`
 variable.
+```
+PROC TRANSPOSE DATA=dataset OUT=dataset_long;
+   VAR GDP Support Healthy Freedom Generosity Corruption;
+   BY Rank Country CNTRY;
+RUN;
 
-        PROC TRANSPOSE DATA=dataset_std OUT=dataset_long;
-           VAR Happiness GDP Support Healthy Freedom Generosity Corruption;
-           BY  Rank Country CNTRY;
-        RUN;
-
-
-        DATA dataset_long;
-          SET  dataset_long (RENAME=(col1=value));
-          SET  dataset_long (RENAME=(_LABEL_=category));
-          DROP COL1;
-          DROP _name_;
-          DROP _LABEL_;
-        RUN; 
+DATA dataset_long;
+  SET dataset_long (RENAME=(col1=value));
+  SET dataset_long (RENAME=(_LABEL_=category));
+  DROP COL1;
+  DROP _name_;
+  DROP _LABEL_;
+RUN; 
+```
 
 With this new dataset, a boxplot can be created.
-
-        PROC SGPLOT DATA=dataset_long; VBOX value / GROUP=category; RUN;
-
+```
+PROC SGPLOT DATA=dataset_long; VBOX value / GROUP=category; RUN;
+```
 <font size="2">
-
 ```{r, echo=FALSE, out.width="49%", out.height="20%", fig.cap="Figure 1. Boxplots of Each Variable Before (left) & After (right) Standardization.", fig.show='hold', fig.align='center'}
 knitr::include_graphics(c("images/boxplot.png",
                           "images/std_boxplot.png"))
 ```
-
 </font>
+
 
 ## Correlation Analysis
 
-The pearson correlation (r) matrix and bivariate scatter plots are also
+The pearson correlation (r) matrix (Table 2, [code source](https://blogs.sas.com/content/graphicallyspeaking/2017/12/11/displaying-upper-lower-triangle-correlation-matrix/)) and bivariate scatter plot (Figure 2) are also
 analyzed to see if any there are any significant correlations between
 the variables of interest. Although there are no universal rules for
-interpreting coefficients, Cohen's recommended guidelines
+interpreting coefficients, [Cohen's](https://doi.org/10.4324/9780203771587) recommended guidelines
 state the following:
-
-**Cohen J: Statistical Power Analysis for the Behavioral Sciences. 2nd
-ed. Hillsdale, NJ, Lawrence Erlbaum, 1988.**
 
 -   \|r\| \< 0.3 → Weak relationship
 -   0.3 ≤ \|r\| ≤ 0.5 → Moderate relationship
 -   \|r\| \> 0.5 → Strong relationship
 
-        PROC CORR DATA=dataset_std;
-            VAR GDP Support Healthy Freedom Generosity Corruption;
-        RUN;
+```
+* Correlation matrix;
+PROC CORR DATA=dataset_std;
+  VAR GDP Support Healthy Freedom Generosity Corruption;
+  ods output PearsonCorr=p;
+RUN;
 
-        PROC SGSCATTER DATA=dataset_std;
-           MATRIX GDP Support Healthy Freedom Generosity Corruption / 
-           DIAGONAL=(KERNEL HISTOGRAM);
-        RUN;
+* Obtain lower triangle of corr matrix;
+DATA p2;
+  SET p END=__eof;
+  ARRAY __n[*] _NUMERIC_;
+  DO __i = _n_ TO dim(__n); __n[__i] = ._; END;
+  IF _n_ = 1 THEN DO;
+    CALL execute('data _null_; set p2;');
+    CALL execute('file print ods=(template="Base.Corr.StackedMatrix"');
+    CALL execute('columns=(rowname=variable');
+  END;
+	CALL execute(CATS('matrix=',VNAME(__n[_n_]),'(generic)'));
+	IF __eof THEN CALL execute(')); put _ods_; run;');
+RUN;
 
-<font size="2">
-
-```{r, echo=FALSE, results='asis'}
-
-tab <- matrix(c(1,	    0.7224,	0.8155,	0.4585,-0.1645,	0.3779,
-                0.7224,	1,	    0.6667,	0.4802,-0.0024,	0.2235,
-                0.8155,	0.6667,	1,	    0.433,-0.0981,	0.3625,
-                0.4585,	0.4802,	0.433,	1,	    0.1766,	0.4024,
-               -0.1645,-0.0024,-0.0981,	0.1766,	1,	    0.0951,
-                0.3779,	0.2235,	0.3625,	0.4024,	0.0951,	1
-), 
-              ncol=6, byrow=TRUE)
-
-colnames(tab) <- c('GDP','Support','Healthy','Freedom','Generosity','Corruption')
-rownames(tab) <- c('GDP','Support','Healthy','Freedom','Generosity','Corruption')
-
-tab <- as.table(tab)
-
-knitr::kable(tab, align='cccccc', caption = "Table XX. Pearson Correlation Coefficient Matrix.")
+* Bivariate plots;
+PROC SGSCATTER DATA=dataset_std;
+	MATRIX GDP Support Healthy Freedom Generosity Corruption / 
+	DIAGONAL=(KERNEL HISTOGRAM);
+RUN;
 ```
 
-```{r, echo=FALSE, out.width="49%", out.height="20%", fig.cap="Figure XX. Bivariate Scatter Plot.", fig.show='hold', fig.align='center'}
+<font size="2">
+```{r, echo=FALSE, out.width="49%", out.height="20%", fig.cap="Table 2. Pearson Correlation Matrix.", fig.show='hold', fig.align='center'}
+knitr::include_graphics("images/corr_matrix_lower_triangle.png", dpi = NA)
+```
+```{r, echo=FALSE, out.width="49%", out.height="20%", fig.cap="Figure 2. Bivariate Scatter Plot.", fig.show='hold', fig.align='center'}
 knitr::include_graphics("images/corr_plot.png", dpi = NA)
 ```
 </font>
 
-All bivariate relationships are summarized in TABLE XXX. The strongest 
-positive correlations are between `GDP` versus `Support` &`Healthy`. 
+
+All bivariate relationships are summarized in Table 3. The strongest 
+positive correlations are between `GDP` versus `Support` & `Healthy`. 
 Indicating that countries with higher GDPs usually have more
 people with social structures of support among friends & relatives; and
 citizens from higher GDP countries tend to have a higher life
@@ -208,9 +200,7 @@ where many people donate to charity aren't associated with other
 indicators of happiness).
 
 <font size="2">
-
 ```{r, echo=FALSE, results='asis'}
-
 tab <- matrix(c('Support, Healthy',   'Healthy',  '',                    '',          '',
                 'Freedom, Corruption','Freedom',  'Freedom, Corruption', 'Corruption','',
                 'Generosity','Generosity, Corruption','Generosity','Generosity','Corruption'), 
@@ -221,7 +211,7 @@ rownames(tab) <- c('Strong','Moderate','Weak')
 
 tab <- as.table(tab)
 
-knitr::kable(tab, align='ccccc', caption = "Table XX. Correlated Variables.")
+knitr::kable(tab, align='ccccc', caption = "Table 3. Correlated Variables.")
 ```
 </font>
 
@@ -249,34 +239,34 @@ The SAS macro below is used to conduct the cluster analysis and create the
 dendrogram (tree) plots shown in FIGURE XXX.
 ```
 %MACRO AgglomCluster(ds, clustMethod, OutName);
-  PROC CLUSTER DATA=&ds METHOD=&clustMethod RSQ NOSQUARE NONORM NOEIGEN out=&OutName; 
-    VAR Happiness GDP Support Healthy Freedom Generosity Corruption; 
-    ID CNTRY; 
-  
-  PROC SORT; BY _ncl_;
-            
-  PROC TREE DATA=&OutName; ID CNTRY;                    * Create dendrograms;
-  DATA &OutName; SET &OutName; &clustMethod = _rsq_;    * Adding R sq values for each method to new variable;
-  RUN;
+	PROC CLUSTER DATA=&ds METHOD=&clustMethod RSQ NOSQUARE NOEIGEN NONORM OUT=&OutName; 
+		VAR GDP Support Healthy Freedom Generosity Corruption;
+		ID CNTRY; 
+	PROC SORT; BY _ncl_;
+
+	PROC TREE DATA=&OutName; ID CNTRY;                   * Create dendrograms;
+	DATA &OutName; SET &OutName; &clustMethod = _rsq_;   * Adding R sq values for each method to new variable;
+	RUN;
 %MEND AgglomCluster;
 ```
+
 The %AgglomCluster macro above is wrapped into the macro below which
 allows one to loop through each distance method and obtain the cluster
 analysis results for each method.
 ```
-        %let param1 = single    complete    centroid    ward    average;     * distance method options;
-        %let param2 = singleout completeout centroidout wardout averageout;  * Cluster analysis output datasets;
-        %macro loop();
-            %do i=1 %to %sysfunc(countw(&param1,%str( )));
-                %let thisparam1=%scan(&param1,&i,%str( ));
-                %let thisparam2=%scan(&param2,&i,%str( ));
-                %put &thisparam1 &thisparam2;
-                %AgglomCluster(dataset_std, &thisparam1, &thisparam2);
-            %end;
-        %mend loop;
-        %loop;
+%let param1 = single    complete    centroid    ward    average;    * distance method options;
+%let param2 = singleout completeout centroidout wardout averageout; * Cluster analysis output datasets;
+%macro loop();
+    %do i=1 %to %sysfunc(countw(&param1,%str( )));
+        %let thisparam1=%scan(&param1,&i,%str( ));
+        %let thisparam2=%scan(&param2,&i,%str( ));
+        %put &thisparam1 &thisparam2;
+        %AgglomCluster(dataset_std, &thisparam1, &thisparam2);
+    %end;
+%mend loop;
+%loop;
 ```
-Figure XXX illustrates the dendrograms of the five clustering methods.
+Figure 3 illustrates the dendrograms of the five clustering methods.
 Using the distance (height) between clusters, we can see that the
 complete and Ward's error methods suggest a solution of 4 or 5 clusters
 (perhaps 6 for complete linkage). The single linkage noticeably suffers
@@ -284,8 +274,7 @@ from the chaining effect, and the centroid & average methods do not
 yield clear clustering patterns.
 
 <font size="2">
-
-```{r, echo=FALSE, out.width="35%", out.height="15%", fig.cap="FIGURE XX. Cluster Dendrograms of the Five Methods.", fig.show='hold', fig.align='center'}
+```{r, echo=FALSE, out.width="35%", out.height="15%", fig.cap="Figure 3. Cluster Dendrograms of the Five Methods.", fig.show='hold', fig.align='center'}
 knitr::include_graphics(c("images/single_tree_new.png",
                           "images/complete_tree_new.png",
                           "images/centroid_tree_new.png",
@@ -296,15 +285,15 @@ knitr::include_graphics(c("images/single_tree_new.png",
 
 </font>
 
-Figure XXX plots the R<sup>2</sup> values of the different cluster
+Figure 4 illustrates the R<sup>2</sup> values of the different cluster
 solutions from the five methods. The Ward's error, complete, and average
 linkage methods yield much better R<sup>2</sup> values compared to the
 single linkage or the centroid methods.
 
 The Ward's error method has the best R<sup>2</sup> values comparatively. 
 At a cluster size of 4 or larger, the R<sup>2</sup> value is over 0.50 
-(with 4 clusters producing an R<sup>2</sup> = 0.54). This also appears to 
-be the pointwhere adding new clusters only provides a small increase to the 
+(with 4 clusters producing an R<sup>2</sup> = 0.54). A cluster size of 6 appears to 
+be the point where adding new clusters only provides a small increase to the 
 overall R<sup>2</sup>. The R<sup>2</sup> value for complete linkage increases
 drastically when the cluster size changes from 2 to 3 and from 5 to 6.
 It exhibits an R<sup>2</sup> value is over 0.50 for 6 clusters, and a
@@ -315,103 +304,105 @@ sharp increases in R<sup>2</sup> when the number of clusters increases
 from 9 to 10 and from 12 to 13 for the centroid method. However, there
 are no sharp increase for the single linkage method.
 ```
-        *Merging all output datasets for all methods into one dataset sorted by the # of clusters;
-        DATA outputs; MERGE singleout completeout centroidout wardout averageout; BY _ncl_;
-        DATA outputs; SET outputs; IF _ncl_ <20;
+DATA outputs; MERGE singleout completeout centroidout wardout averageout; BY _ncl_;
+DATA outputs; SET outputs; IF _ncl_ <20;
 
-        symbol1 i = join v = S l = 1  c = gray; 
-        symbol2 i = join v = P l = 5  c = blue;
-        symbol3 i = join v = C l = 10 c = orange; 
-        symbol4 i = join v = W l = 15 c = red;
-        symbol5 i = join v = A l = 20 c = CX00FF00;
+symbol1 i = join v = S l = 1  c = gray; 
+symbol2 i = join v = P l = 5  c = blue;
+symbol3 i = join v = C l = 10 c = orange; 
+symbol4 i = join v = W l = 15 c = red;
+symbol5 i = join v = A l = 20 c = CX00FF00;
 
-        PROC GPLOT DATA = outputs;
-        PLOT single*_ncl_=1 complete*_ncl_=2 centroid*_ncl_=3 ward*_ncl_=4 average*_ncl_=5 /OVERLAY LEGEND;
-        RUN;
+PROC GPLOT DATA = outputs;
+	PLOT single*_ncl_=1 complete*_ncl_=2 centroid*_ncl_=3 ward*_ncl_=4 average*_ncl_=5 /OVERLAY LEGEND;
+RUN;
 ```
-```{r, echo=FALSE, out.width="65%", fig.cap="Fig. XX R<sup>2</sup> Plots for the Five Different Methods.", fig.show='hold', fig.align='center'}
-knitr::include_graphics("images/rsq_plot.png", 
-                        dpi = NA)
+
+<font size="2">
+```{r, echo=FALSE, out.width="65%", fig.cap="Figure 4. R<sup>2</sup> Plots for the Five Methods.", fig.show='hold', fig.align='center'}
+knitr::include_graphics("images/rsq_plot.png", dpi = NA)
 ```
+</font>
+
+As such, the Ward's Error method at a cluster size of 6 or 7 is selected as the optimal solution for agglomerative hierarchical cluster analysis.
+
+
 
 # K-Means Clustering
 
+
 ## Methods
 
-Since several variables are correlated with one another, the typical measures used to evaluate different k-means clustering models, i.e., the Cubic Clustering Criterion (CCC) and overall R<sup>2</sup>, cannot be used. To use them, a principal component analysis (PCA) must be performed to obtain orthogonal axes before using the k-means algorithm.
+Since several variables are correlated with one another, the typical measures used to evaluate different k-means clustering models, i.e., the Cubic Clustering Criterion (CCC) and Approximate Expected Overall R<sup>2</sup>, cannot be used. To use them, a principal component analysis (PCA) must be performed to obtain orthogonal axes before using the k-means algorithm.
 
 ### Principal Component Analysis
 
 PCA is a feature engineering technique used to reduce the dimensionality of a dataset while minimizing information loss. It does so by creating new set of uncorrelated variables that successively maximize variance of the original dataset.
 
-Steps:
+PCA Steps:
 
-1.  Compute the correlation matrix of the observational data (see TableXX/Figure
-    XXX).
-2.  Compute the eigenvalues and eigenvectors of the correlation matrix (see Table XXXX).
+1.  Compute the correlation matrix of the observational data (see Table/Figure 2).
+2.  Compute the eigenvalues and eigenvectors of the correlation matrix (see Table 4).
 3.  Determine the number of components to extract.
 
-The Kaiser rule indicates to retain principal component (PCs) whose eigenvalues are greater than one. In this case, the eigenvalues of the first two components are larger than one. The largest component explains 50.67% of the total variance in the data, and the second largest component 19.72%. In total, 70.39% of the total variance in the data can be explained by the two components. In the scree plot (Figure XXX), the "elbow" is located at the position of the second largest eigenvalue, suggesting the first two components should be extracted.
+The Kaiser rule indicates to retain principal component (PCs) whose eigenvalues are greater than one. In this case, the eigenvalues of the first two components are larger than one. In the scree plot (Figure 5), the "elbow" is located at the position of the second largest eigenvalue, also suggesting the first two components should be extracted. The largest component explains 50.67% of the total variance in the data, and the second largest component 19.72%. In total, 70.39% of the total variance in the data can be explained by the two components. 
 
 ```
-    PROC PRINCOMP DATA=dataset_std OUT=dataset_PCA;
-        VAR GDP Support Healthy Freedom Generosity Corruption;
-    RUN;
-
-    * Calculate the structual loads to interpret new PC axes;
-    PROC CORR noprob nosimple;
-        VAR  GDP Support Healthy Freedom Generosity Corruption;
-        WITH Prin1 Prin2 Prin3 Prin4 Prin5 Prin6;
-    RUN;
+PROC PRINCOMP DATA=dataset_std OUT=dataset_PCA;
+	VAR GDP Support Healthy Freedom Generosity Corruption;
+RUN;
 ```
 
-```{r, echo=FALSE, out.width="33%", fig.cap=" Table. XX Eigenvalues & The Variance Explained.", fig.show='hold', fig.align='center'}
+<font size="2">
+```{r, echo=FALSE, out.width="33%", fig.cap=" Table 4. Eigenvalues & The Variance Explained.", fig.show='hold', fig.align='center'}
 knitr::include_graphics("images/eigenvalues.png")
 ```
-
-
-```{r, echo=FALSE, out.width="65%", fig.cap=" Fig. XXX Scree Plot & Variance Explained per PC.", fig.show='hold', fig.align='center'}
+```{r, echo=FALSE, out.width="60%", fig.cap=" Figure 5. Scree Plot & Variance Explained per PC.", fig.show='hold', fig.align='center'}
 knitr::include_graphics("images/PCA_scree_plot.png")
 ```
+</font>
 
 
 ### K-Means on PC Scores
 
-For this method, the number of clusters used for the cluster analysis, the k in k-means, is determined a priori. Then each observation is assigned to its closest cluster. 
 
-The order of the reassignment of observations and the recalculation of the centroids are determined by the method one selects: classical k-means clustering versus improved k-means clustering method.
+For this method, the number of clusters (k) used in the analysis is determined a priori. 
 
-This reassignment of observations is repeated until no improvements can be made to the clusters.
+1) k datapoints from the dataset are selected at random as the initial centroids of each cluster.
+2) Each data point is then assigned to the closest cluster (centroid) and the centroid of each cluster is recalculated.
+3) Step 2 is repeated until no more reassignments are made.
 
-The PC scores of the first 2 components of the PCA are used to run the k-means algorithm. Below, `PROC FASTCLUS` procedure is wrapped in a do statement to run the k-means algorithm for k values between 2 and 20. For each iteration of the algorithm, the Pseudo F-Statistic (F_stat), Cubic Clustering Criterion (CCC), and Approximate Expected Over-All R-Square (App_RSQ) values are collected using the ods statement and placed into a new dataset with `PROC APPEND`. Once all the k values have been iterated, plots of three statistics of interest are created to determine the optimal cluster size.
+The PC scores of the first 2 components of the PCA are used to run the k-means algorithm. Below, `PROC FASTCLUS` procedure is wrapped in a do statement to run the k-means algorithm for k values between 2 and 20. For each iteration of the algorithm, the Pseudo F-Statistic (F_stat), Cubic Clustering Criterion (CCC), and Approximate Expected Over-All R-Square (App_RSQ) values are collected using the `ods` statement and placed into a new dataset with `PROC APPEND`. Once all the k values have been iterated, plots of three statistics of interest are created to determine the optimal cluster size.
 
+To make sure that the initial k clusters defined are appropriately, one can specify a minimum distance that any two centriods must be separated by. Radii larger than 3 proved to be too large for the data as it reduces the maximum number of clusters to 3 or 4 and produced evaluation statistics plots that converged too quickly. Hence, radii of 0 to 2 were evaluated.
+
+- A radius of 2 reduced the maximum number of clusters to 7 or 8
+- A radius of 1 reduced the maximum number of clusters to 5 or 8
+- A radius of 0 reduced the maximum number of clusters to 7 or 9
 
 ```
-* Conduct k-means cluster anlaysis using the PC scores for values k = 2 to 20;
 %MACRO doFASTCLUS;
 	%DO k=2 %TO 20;
 	
-	  * Collect pseudo F-stat, approx rsq, and CCC values per k value analysis;
-	  ods output PseudoFStat         =  F_stat&k.(keep = value rename = (value = f_value));
-	  ods output ApproxExpOverAllRSq = App_RSQ&k.(keep = value rename = (value = aprx_rsq));
-	  ods output CCC                 =     CCC&k.(keep = value rename = (value = ccc));
+		* Collect pseudo F-stat, approx rsq, and CCC values per k value analysis;
+		ods output PseudoFStat         =  F_stat&k.(keep = value rename = (value = f_value));
+		ods output ApproxExpOverAllRSq = App_RSQ&k.(keep = value rename = (value = aprx_rsq));
+		ods output CCC                 =     CCC&k.(keep = value rename = (value = ccc));
 	
-	  * Conduct K-mean;
-	  PROC FASTCLUS 
-		  DATA=dataset_PCA OUT=dsKM_&k MAXITER=100 RADIUS=0 MAXCLUSTERS=&k SUMMARY REPLACE=full;
-		  VAR Prin1 Prin2;
-	  RUN;
+		*Conduct K-mean;
+		PROC FASTCLUS DATA=dataset_PCA OUT=dsKM_&k MAXITER=100 RADIUS=0 MAXCLUSTERS=&k SUMMARY REPLACE=full;
+			VAR Prin1 Prin2;
+		RUN;
 	
-	  * Save evaluation stats;
-	  DATA F_stat&k;  SET F_stat&k.;  cluster=&k.; RUN;
-	  DATA App_RSQ&k; SET App_RSQ&k.; cluster=&k.; RUN;	
-	  DATA CCC&k;     SET CCC&k.;     cluster=&k.; RUN;
+		* Save evaluation stats;
+		DATA F_stat&k;  SET F_stat&k.;  cluster=&k.; RUN;
+		DATA App_RSQ&k; SET App_RSQ&k.; cluster=&k.; RUN;	
+		DATA CCC&k;     SET CCC&k.;     cluster=&k.; RUN;
 	
-	  * Collect stat values per k-value into one dataset;
-	  PROC APPEND BASE=F_stat  DATA=F_stat&k.;  RUN; PROC DELETE DATA=F_stat&k.; RUN;
-	  PROC APPEND BASE=App_RSQ DATA=App_RSQ&k.; RUN; PROC DELETE DATA=App_RSQ&k.; RUN;
-	  PROC APPEND BASE=CCC     DATA=CCC&k.;     RUN; PROC DELETE DATA=CCC&k.; RUN;
-	
+		* Collect stat values per k-value into one dataset;
+		PROC APPEND BASE=F_stat  DATA=F_stat&k.;  RUN; PROC DELETE DATA=F_stat&k.; RUN;
+		PROC APPEND BASE=App_RSQ DATA=App_RSQ&k.; RUN; PROC DELETE DATA=App_RSQ&k.; RUN;
+		PROC APPEND BASE=CCC     DATA=CCC&k.;     RUN; PROC DELETE DATA=CCC&k.; RUN;
 	%END;
 	
 	* Plot Stats;
@@ -433,30 +424,51 @@ The PC scores of the first 2 components of the PCA are used to run the k-means a
 	
 %MEND; 
 %doFASTCLUS;
-
 ```
 
-```{r, echo=FALSE, out.width="45%", fig.cap="FIGURE XX. K-Means Evaluation Statistics.", fig.show='hold', fig.align='center'}
+<font size="2">
+```{r, echo=FALSE, out.width="45%", fig.cap="Figure 6. K-Means Evaluation Statistics.", fig.show='hold', fig.align='center'}
 knitr::include_graphics(c("images/f_stat.png",
                           "images/app_rsq.png",
                           "images/ccc.png")
                         )
 ```
+</font>
 
  - The `Psuedo F-Statistic` is the same as the ANOVA F-statistic. This is the ratio of the "between-cluster variance" to the "within-cluster variance". Local maxima indicate potential cluster solutions (k = 7, 9, 10).
  
- - The `CCC` compares the R2 you get for a given set of clusters with the R2 you would get by clustering a uniformly distributed set of points in p dimensional space. Similarly, local maxima of the `CCC` indicate potential cluster solutions (k = 7, 9, 10).
+ - The `CCC` compares the R<sup>2</sup> you get for a given set of clusters with the R<sup>2</sup> you would get by clustering a uniformly distributed set of points in p dimensional space. Similarly, local maxima of the `CCC` indicate potential cluster solutions (k = 7, 9, 10).
 
 - At a cluster size of 7 or larger, the `approx. overall R^2` value is at 0.88. This also appears to be the point where adding new clusters only provides a small increase to the measure.
 
 Given this information, a cluster size of 7 is selected for the k-means algorithm.
 
+
 # Interpretation
 
 - determine which model you selected and why
+- which choose specific k-means radius??? maybe use canocial images to choose???
 - show plot of clusters with PCs or canonical w/e
-- Discuss use of ANOVA on original measures too describle clusters
+- Discuss use of ANOVA on original measures too describe clusters
 - Describe avg happiness score per cluster
+- color code countries by final clusters and add maps
+
+Given all the competing solutions, the k-means algorithm with radius = 0 and k = 7 was selected as the final solution as it performs better for all the evaluation statistics and logical and straightforward clustering. To better interpret the clusters, an analysis of variance (ANOVA) for each variable is conducted to compare their means across the clusters. The Bonferroni method is applied such that the null hypothesis, of equal means among clusters, is rejected at level $\alpha = 0.05$ if the p-value is less than $\alpha/p$. Here, $p = 6$ so for level test, we reject the null hypothesis of equality of cluster means if the p-value is less than 0.0083.
+
+
+In the following text, we provide our interpretations to the results obtained from the Ward’s error method. 
+
+With a solution of 7 clusters, the countries can be grouped as follows:
+
+- Cluster 1 – Leisure sports.
+- Cluster 2 – Athletics that requires speed and power.
+- Cluster 3 – (Mostly) Team sports that require high body coordination and quick reaction.
+- Cluster 4 – High endurance sports.
+- Cluster 5 – Outdoor and adventurous activities
+- Cluster 6 – (Mostly) Competitive and highly body contact sports
+- Cluster 7 – Motorized/ horse sports that require the control of an external entity for movement
+
+Figure 4 presents the silhouette plots of the 4- and 7-cluster solutions using the Ward’s error method. Silhouette plot provides information about the appropriate number of clusters and whether the clusters are homogeneous. The average silhouette values of the 4 and 7 clusters are similar, 0.25 and 0.26, respectively. It can be seen from the plots that there are several observations that have a negative silhouette value, indicating that they are not appropriately classified. For example, for the 7-cluster solution, gymnastics and figure skating are oddly placed into our high body contact sport group along with wrestling and basketball (Cluster 6), cheerleading and roller skating placed into Outdoor and adventurous activities (Cluster 5), and basketball grouped with boxing instead of soccer. This makes our group interpretations less clear cut. Leisure sport cluster seems to be most stable and perhaps most distinct as it rarely changes between different methods and numbers of clusters.
 
 # Conclusion
 
