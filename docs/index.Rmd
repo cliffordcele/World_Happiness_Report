@@ -158,7 +158,7 @@ PROC CORR DATA=dataset_std;
   ods output PearsonCorr=p;
 RUN;
 
-* Obtain lower triangle of corr matrix;
+* Obtain lower triangle of corr matrix; 
 DATA p2;
   SET p END=__eof;
   ARRAY __n[*] _NUMERIC_;
@@ -235,8 +235,7 @@ using one of five methods:
 4) Average Linkage 
 5) Ward's Error
 
-The SAS macro below is used to conduct the cluster analysis and create the
-dendrogram (tree) plots shown in FIGURE XXX.
+The SAS macro below is used to conduct the cluster analysis and create the dendrogram (tree) plots shown in Figure 3
 ```
 %MACRO AgglomCluster(ds, clustMethod, OutName);
 	PROC CLUSTER DATA=&ds METHOD=&clustMethod RSQ NOSQUARE NOEIGEN NONORM OUT=&OutName; 
@@ -453,8 +452,11 @@ Given this information, a cluster size of 7 is selected for the k-means algorith
 - Describe avg happiness score per cluster
 - color code countries by final clusters and add maps
 
-Given all the competing solutions, the k-means algorithm with radius = 0 and k = 7 was selected as the final solution as it performs better for all the evaluation statistics and logical and straightforward clustering. To better interpret the clusters, an analysis of variance (ANOVA) for each variable is conducted to compare their means across the clusters. The Bonferroni method is applied such that the null hypothesis, of equal means among clusters, is rejected at level $\alpha = 0.05$ if the p-value is less than $\alpha/p$. Here, $p = 6$ so for level test, we reject the null hypothesis of equality of cluster means if the p-value is less than 0.0083.
+Given all the competing solutions, the k-means algorithm with radius = 0 and k = 7 was selected as the final solution as it performs better for all the evaluation statistics and logical and straightforward clustering. To better interpret the clusters, an analysis of variance (ANOVA) for each variable is conducted to compare their means across the clusters. The Bonferroni method is applied such that the null hypothesis, of equal means among clusters, is rejected at level $\alpha = 0.05$ if the p-value is less than $\alpha/p$. Here, $p = 6$ so for level test, we reject the null hypothesis of equality of cluster means if the p-value is less than 0.0083 [[source](https://online.stat.psu.edu/stat505/lesson/14/14.6)].
 
+```{r, echo=FALSE}
+knitr::include_url("https://public.tableau.com/views/WHR_Cluster_Analysis/Dashboard2?:language=en-US&publish=yes&:display_count=n&:origin=viz_share_link")
+```
 
 In the following text, we provide our interpretations to the results obtained from the Ward’s error method. 
 
@@ -469,6 +471,8 @@ With a solution of 7 clusters, the countries can be grouped as follows:
 - Cluster 7 – Motorized/ horse sports that require the control of an external entity for movement
 
 Figure 4 presents the silhouette plots of the 4- and 7-cluster solutions using the Ward’s error method. Silhouette plot provides information about the appropriate number of clusters and whether the clusters are homogeneous. The average silhouette values of the 4 and 7 clusters are similar, 0.25 and 0.26, respectively. It can be seen from the plots that there are several observations that have a negative silhouette value, indicating that they are not appropriately classified. For example, for the 7-cluster solution, gymnastics and figure skating are oddly placed into our high body contact sport group along with wrestling and basketball (Cluster 6), cheerleading and roller skating placed into Outdoor and adventurous activities (Cluster 5), and basketball grouped with boxing instead of soccer. This makes our group interpretations less clear cut. Leisure sport cluster seems to be most stable and perhaps most distinct as it rarely changes between different methods and numbers of clusters.
+
+
 
 # Conclusion
 
