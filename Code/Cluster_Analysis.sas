@@ -132,7 +132,7 @@ RUN;
 
 
 * Selected method results;
-PROC TREE DATA = wardout OUT = clus NCLUSTERS = 5; 
+PROC TREE DATA = wardout OUT = clus NCLUSTERS = 7; 
 	ID CNTRY; COPY GDP Support Healthy Freedom Generosity Corruption;
 RUN;
 PROC SORT; BY cluster; RUN;
@@ -157,7 +157,7 @@ RUN;
 
 /*export data from PROC CANDISC to file called can_km.xlsx*/
 PROC EXPORT DATA=can
-    OUTFILE="/home/u43389324/Happiness/can_wards.xlsx"
+    OUTFILE="/home/u43389324/Happiness/can_wards7.xlsx"
     DBMS=xlsx
     REPLACE;
     SHEET="Sheet 1";
