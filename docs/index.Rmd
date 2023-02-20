@@ -458,8 +458,4 @@ knitr::include_url("https://public.tableau.com/views/WHR_Cluster_Analysis_KM/Das
 
 Discuss which model chosen and why
 
-`html_pretty` in the
-[**prettydoc**](https://github.com/yixuan/prettydoc/) package is a new
-output format for creating HTML documents from R Markdown files.
-`html_pretty` is more lightweight compared to `html_document`, and is
-more stylish than `html_vignette` when creating package vignettes.
+
