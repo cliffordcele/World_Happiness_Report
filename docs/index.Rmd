@@ -15,10 +15,7 @@ editor_options:
 
 # Introduction
 
-The World Happiness Report (WHR) uses survey data to describe how people
-evaluate their own lives in various countries around the world.
-Happiness is measured by asking survey participants to respond to the
-following question:
+The [World Happiness Report (WHR)](https://worldhappiness.report/) uses survey data to describe how people evaluate their own lives in various countries around the world. Happiness is measured by asking survey participants to respond to the following question:
 
 -   `Happiness:` "Please imagine a ladder, with steps numbered from 0
     at the bottom to 10 at the top. The top of the ladder represents the
@@ -30,17 +27,11 @@ The WHR uses external observational data on the following six life
 factors to estimate their association with happiness and to explain the
 observed variation of happiness across countries.
 
--   `Gross Domestic Product (GDP) per Capita:` Purchasing Power Parity
-    (PPP) adjusted to constant 2017 international dollars, taken from
-    the World Development Indicators (WDI) released by the World Bank on
-    December 16, 2021. after adjustment for population growth. The
-    natural log of GDP per capita, as this form fits
-    the data significantly better than GDP per capita.
+-   `Gross Domestic Product (GDP) per Capita:` Log GDP per Capita in purchasing power          parity. Constant 2017 international dollar prices from World Development Indicators        (WDI).
 
 -   `(Healthy) Life Expectancy:` is constructed based on data from the
     World Health Organization (WHO) Global Health Observatory data
-    repository, with data available for 2000, 2010, 2015, and 2019
-    (extrapolation to 2021).
+    repository.
 
 The following items are based on the national average of the binary
 responses (No = 0, Yes = 1) to the Gallup World Poll (GWP) questions:
@@ -291,7 +282,7 @@ single linkage or the centroid methods.
 
 The Ward's error method has the best R<sup>2</sup> values comparatively. 
 At a cluster size of 4 or larger, the R<sup>2</sup> value is over 0.50 
-(with 4 clusters producing an R<sup>2</sup> = 0.54). A cluster size of 6 appears to 
+(with 4 clusters producing an R<sup>2</sup> = 0.54). A cluster size of 5 or 6 appears to 
 be the point where adding new clusters only provides a small increase to the 
 overall R<sup>2</sup>. The R<sup>2</sup> value for complete linkage increases
 drastically when the cluster size changes from 2 to 3 and from 5 to 6.
@@ -323,7 +314,29 @@ knitr::include_graphics("images/rsq_plot.png", dpi = NA)
 ```
 </font>
 
-As such, the Ward's Error method at a cluster size of 6 or 7 is selected as the optimal solution for agglomerative hierarchical cluster analysis.
+As such, the Ward's Error method at a cluster size of 5 is selected as the optimal solution for agglomerative hierarchical cluster analysis.
+
+
+## Interpretation
+
+
+Given all the competing solutions, the Ward's Error method at a cluster size of 5 is selected as the optimal solution for agglomerative hierarchical cluster analysis. The clusters are interpreted based on their mean scores, particularly the scores that appear to be different from the other clusters. One can explore the results of this cluster analysis solution in the dashboard below. 
+
+With a solution of 5 clusters, the countries can be grouped as follows:
+
+- Cluster 1 – High GDP, lots of support, very healthy & free, but not very generous.
+- Cluster 2 – High GDP, lots of support, very healthy/free/generous, but a lot of corruption. 
+- Cluster 3 – Very free and generous.
+- Cluster 4 – Not very generous
+- Cluster 5 – Low GDP, support, and not very healthy
+- Cluster 6 – Low GDP, support, and not very healthy
+- Cluster 7 – Low GDP, support, and not very healthy
+
+
+```{r, echo=FALSE}
+knitr::include_url("https://public.tableau.com/views/WHR_Cluster_Analysis/Dashboard?:language=en-US&publish=yes&:display_count=n&:origin=viz_share_link&:showVizHome=no&:embed=true", height="800px")
+```
+
 
 
 
@@ -443,37 +456,25 @@ knitr::include_graphics(c("images/f_stat.png",
 Given this information, a cluster size of 7 is selected for the k-means algorithm.
 
 
-# Interpretation
-
-- determine which model you selected and why
-- which choose specific k-means radius??? maybe use canocial images to choose???
-- show plot of clusters with PCs or canonical w/e
-- Discuss use of ANOVA on original measures too describe clusters
-- Describe avg happiness score per cluster
-- color code countries by final clusters and add maps
-
-Given all the competing solutions, the k-means algorithm with radius = 0 and k = 7 was selected as the final solution as it performs better for all the evaluation statistics and logical and straightforward clustering. To better interpret the clusters, an analysis of variance (ANOVA) for each variable is conducted to compare their means across the clusters. The Bonferroni method is applied such that the null hypothesis, of equal means among clusters, is rejected at level $\alpha = 0.05$ if the p-value is less than $\alpha/p$. Here, $p = 6$ so for level test, we reject the null hypothesis of equality of cluster means if the p-value is less than 0.0083 [[source](https://online.stat.psu.edu/stat505/lesson/14/14.6)]. 
-
-```{r, echo=FALSE}
-knitr::include_url("https://public.tableau.com/views/WHR_Cluster_Analysis/Dashboard2?:language=en-US&:display_count=n&:origin=viz_share_link&:showVizHome=no&:embed=true", height="800px")
-```
+## Interpretation
 
 
-In the following text, we provide our interpretations to the results obtained from the Ward’s error method. 
+Given all the competing solutions, the k-means algorithm with radius = 0 and k = 7 was selected as the final solution as it performs better for all the evaluation statistics and provides logical and straightforward clustering. The clusters are interpreted based on their mean scores, particularly the scores that appear to be different from the other clusters. One can explore the results of this cluster analysis solution in the dashboard below. 
 
 With a solution of 7 clusters, the countries can be grouped as follows:
 
-- Cluster 1 – Leisure sports.
-- Cluster 2 – Athletics that requires speed and power.
-- Cluster 3 – (Mostly) Team sports that require high body coordination and quick reaction.
-- Cluster 4 – High endurance sports.
-- Cluster 5 – Outdoor and adventurous activities
-- Cluster 6 – (Mostly) Competitive and highly body contact sports
-- Cluster 7 – Motorized/ horse sports that require the control of an external entity for movement
-
-Figure 4 presents the silhouette plots of the 4- and 7-cluster solutions using the Ward’s error method. Silhouette plot provides information about the appropriate number of clusters and whether the clusters are homogeneous. The average silhouette values of the 4 and 7 clusters are similar, 0.25 and 0.26, respectively. It can be seen from the plots that there are several observations that have a negative silhouette value, indicating that they are not appropriately classified. For example, for the 7-cluster solution, gymnastics and figure skating are oddly placed into our high body contact sport group along with wrestling and basketball (Cluster 6), cheerleading and roller skating placed into Outdoor and adventurous activities (Cluster 5), and basketball grouped with boxing instead of soccer. This makes our group interpretations less clear cut. Leisure sport cluster seems to be most stable and perhaps most distinct as it rarely changes between different methods and numbers of clusters.
+- Cluster 1 – High GDP, lots of support, very healthy & free, but not very generous.
+- Cluster 2 – High GDP, lots of support, very healthy/free/generous, but a lot of corruption. 
+- Cluster 3 – Very free and generous.
+- Cluster 4 – Not very generous
+- Cluster 5 – Low GDP, support, and not very healthy
+- Cluster 6 – Very healthy and free. 
+- Cluster 7 – Low GDP, support, freedom, and not very healthy
 
 
+```{r, echo=FALSE}
+knitr::include_url("https://public.tableau.com/views/WHR_Cluster_Analysis_KM/Dashboard?:language=en-US&:display_count=n&:origin=viz_share_link&:showVizHome=no&:embed=true", height="800px")
+```
 
 # Conclusion
 
