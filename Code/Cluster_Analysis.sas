@@ -155,7 +155,7 @@ PROC SGPLOT DATA = can;
 RUN;
 
 
-/*export data from PROC CANDISC to file called can_km.xlsx*/
+/*export data from PROC CANDISC to file called can_wards7.xlsx*/
 PROC EXPORT DATA=can
     OUTFILE="/home/u43389324/Happiness/can_wards7.xlsx"
     DBMS=xlsx

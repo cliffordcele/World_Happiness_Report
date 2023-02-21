@@ -1,7 +1,7 @@
 ---
 title: "Cluster Analysis - Countries from the 2022 World Happiness Report"
 author: "Clifford Cele"
-date: "`r Sys.Date()`"
+date: "20-Feb-2023"
 output:
   prettydoc::html_pretty:
     toc: true
@@ -69,7 +69,7 @@ how the groups differ from one another.
 Figure 1 and Table 1 present the boxplot and summary statistics
 (respectively) of each variable from the original dataset. There are no
 missing data, the variables are not on same scale, and each variable
-contains at least one outlier. The summaries also show that the variance
+contains at least one outlier. The summary also shows that the variance
 of `GDP` differs substantially from the other variables. As such, the
 data was standardized before performing the cluster analysis so that
 each variable has a mean of zero and standard deviation (Std Dev) of one.
@@ -182,13 +182,7 @@ knitr::include_graphics("images/corr_plot.png", dpi = NA)
 
 All bivariate relationships are summarized in Table 3. The strongest 
 positive correlations are between `GDP` versus `Support` & `Healthy`. 
-Indicating that countries with higher GDPs usually have more
-people with social structures of support among friends & relatives; and
-citizens from higher GDP countries tend to have a higher life
-expectancy. `Freedom` is moderately correlated with most variables.
-`Generosity` is weakly correlated with all variables (i.e., countries
-where many people donate to charity aren't associated with other
-indicators of happiness).
+Indicating that countries with higher (log) GDPs usually have people with more social structures of support among friends & relatives; and citizens from higher GDP countries tend to have a higher life expectancy. `Freedom` is moderately correlated with most variables. `Generosity` is weakly correlated with all variables (i.e., countries where many people donate to charity aren't associated with other indicators of happiness).
 
 <font size="2">
 ```{r, echo=FALSE, results='asis'}
@@ -205,10 +199,6 @@ tab <- as.table(tab)
 knitr::kable(tab, align='ccccc', caption = "Table 3. Correlated Variables.")
 ```
 </font>
-
-# Assumptions
-
-The Euclidean distance is for each cluster analysis method.
 
 # Agglomerative Hierarchical Clustering
 
@@ -323,11 +313,11 @@ As such, the Ward's Error method at a cluster size of 6 is selected as the optim
 
 ## Methods
 
-Since several variables are correlated with one another, the typical measures used to evaluate different k-means clustering models, i.e., the Cubic Clustering Criterion (CCC) and Approximate Expected Overall R<sup>2</sup>, cannot be used. To use them, a principal component analysis (PCA) must be performed to obtain orthogonal axes before using the k-means algorithm.
+Since several variables are correlated with one another, the typical measures used to evaluate different k-means clustering models, i.e., the Cubic Clustering Criterion (CCC) and Approximate Expected Overall R<sup>2</sup>, cannot be used [source](https://documentation.sas.com/doc/en/statcdc/14.2/statug/statug_fastclus_syntax01.htm). To use them, a principal component analysis (PCA) must be performed to obtain orthogonal axes before using the k-means algorithm.
 
 ### Principal Component Analysis
 
-PCA is a feature engineering technique used to reduce the dimensionality of a dataset while minimizing information loss. It does so by creating new set of uncorrelated variables that successively maximize variance of the original dataset.
+PCA is a feature engineering technique used to reduce the dimensionality of a dataset while minimizing information loss. It does so by creating new set of uncorrelated variables that successively maximize the variance of the original dataset.
 
 PCA Steps:
 
@@ -335,7 +325,7 @@ PCA Steps:
 2.  Compute the eigenvalues and eigenvectors of the correlation matrix (see Table 4).
 3.  Determine the number of components to extract.
 
-The Kaiser rule indicates to retain principal component (PCs) whose eigenvalues are greater than one. In this case, the eigenvalues of the first two components are larger than one. In the scree plot (Figure 5), the "elbow" is located at the position of the second largest eigenvalue, also suggesting the first two components should be extracted. The largest component explains 50.67% of the total variance in the data, and the second largest component 19.72%. In total, 70.39% of the total variance in the data can be explained by the two components. 
+The Kaiser rule indicates to retain principal component (PCs) whose eigenvalues are greater than one. In this case, the eigenvalues of the first two components are larger than one (Table 4). In the scree plot (Figure 5), the "elbow" is located at the position of the second largest eigenvalue, also suggesting the first two components should be extracted. The largest component explains 50.67% of the total variance in the data, and the second largest component 19.72%. In total, 70.39% of the total variance in the data can be explained by the two components. 
 
 ```
 PROC PRINCOMP DATA=dataset_std OUT=dataset_PCA;
@@ -359,16 +349,14 @@ knitr::include_graphics("images/PCA_scree_plot.png")
 For this method, the number of clusters (k) used in the analysis is determined a priori. 
 
 1) k datapoints from the dataset are selected at random as the initial centroids of each cluster.
-2) Each data point is then assigned to the closest cluster (centroid) and the centroid of each cluster is recalculated.
-3) Step 2 is repeated until no more reassignments are made.
+2) Each data point is then assigned to the closest cluster (centroid) 
+3) The centroid of each cluster is recalculated.
+4) Step 2 and 3 are repeated until no more reassignments are made.
 
 The PC scores of the first 2 components of the PCA are used to run the k-means algorithm. Below, `PROC FASTCLUS` procedure is wrapped in a do statement to run the k-means algorithm for k values between 2 and 20. For each iteration of the algorithm, the Pseudo F-Statistic (F_stat), Cubic Clustering Criterion (CCC), and Approximate Expected Over-All R-Square (App_RSQ) values are collected using the `ods` statement and placed into a new dataset with `PROC APPEND`. Once all the k values have been iterated, plots of three statistics of interest are created to determine the optimal cluster size.
 
-To make sure that the initial k clusters defined are appropriately, one can specify a minimum distance that any two centriods must be separated by. Radii larger than 3 proved to be too large for the data as it reduces the maximum number of clusters to 3 or 4 and produced evaluation statistics plots that converged too quickly. Hence, radii of 0 to 2 were evaluated.
+To make sure that the initial k clusters defined are appropriately, one can specify a minimum distance that any two centriods must be separated by. Radii larger than 3 proved to be too large for the data as it reduces the maximum number of clusters to 3 or 4 and produced evaluation statistics plots that converged too quickly. Hence, radii of 0 to 2 were evaluated and a radius of 0 was selected since its evaluation statistics plots appeared the most stable.
 
-- A radius of 2 reduced the maximum number of clusters to 7 or 8
-- A radius of 1 reduced the maximum number of clusters to 5 or 8
-- A radius of 0 reduced the maximum number of clusters to 7 or 9
 
 ```
 %MACRO doFASTCLUS;
@@ -434,10 +422,10 @@ knitr::include_graphics(c("images/f_stat.png",
 Given this information, a cluster size of 7 is selected for the k-means algorithm.
 
 
-# Interpretation
+# Conclusion
 
 
-Given all the competing solutions, the k-means algorithm with radius = 0 and k = 7 was selected as the final solution as it performs better for all the evaluation statistics and provides logical and straightforward clustering. The clusters are interpreted based on their mean scores, particularly the scores that appear to be different from the other clusters. One can explore the results of this cluster analysis solution in the dashboard below. 
+Given all the competing solutions, the k-means algorithm with radius = 0 and k = 7 was selected as the final solution as it performs better for all the evaluation statistics and provides logical and straightforward clustering. The clusters are interpreted based on their mean scores, particularly the scores that appear to be different from the other clusters. One can explore the results of this cluster analysis solution in the dashboard below. The two PCs are used to visualize the clusters in 2D space.
 
 With a solution of 7 clusters, the countries can be grouped as follows:
 
@@ -445,7 +433,7 @@ With a solution of 7 clusters, the countries can be grouped as follows:
 - Cluster 2 – High GDP, lots of support, very healthy/free/generous, but a lot of corruption. 
 - Cluster 3 – Very free and generous.
 - Cluster 4 – Not very generous
-- Cluster 5 – Low GDP, support, and not very healthy
+- Cluster 5 – Low GDP and support; not very healthy
 - Cluster 6 – Very healthy and free. 
 - Cluster 7 – Low GDP, support, freedom, and not very healthy
 
@@ -453,9 +441,4 @@ With a solution of 7 clusters, the countries can be grouped as follows:
 ```{r, echo=FALSE}
 knitr::include_url("https://public.tableau.com/views/WHR_Cluster_Analysis_KM/Dashboard?:language=en-US&:display_count=n&:origin=viz_share_link&:showVizHome=no&:embed=true", height="800px")
 ```
-
-# Conclusion
-
-Discuss which model chosen and why
-
 

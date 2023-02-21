@@ -12,7 +12,6 @@
 
 <meta name="author" content="Clifford Cele" />
 
-<meta name="date" content="2023-02-20" />
 
 <title>Cluster Analysis - Countries from the 2022 World Happiness Report</title>
 
@@ -60,7 +59,7 @@ code span.ot { color: #007020; }
 <h1 class="title toc-ignore project-name">Cluster Analysis - Countries
 from the 2022 World Happiness Report</h1>
 <h4 class="author project-author">Clifford Cele</h4>
-<h4 class="date project-date">2023-02-20</h4>
+<h4 class="date project-date">20-Feb-2023</h4>
 </section>
 
 
@@ -75,7 +74,6 @@ Statistics</a></li>
 <li><a href="#boxplots" id="toc-boxplots">Boxplots</a></li>
 <li><a href="#correlation-analysis" id="toc-correlation-analysis">Correlation Analysis</a></li>
 </ul></li>
-<li><a href="#assumptions" id="toc-assumptions">Assumptions</a></li>
 <li><a href="#agglomerative-hierarchical-clustering" id="toc-agglomerative-hierarchical-clustering">Agglomerative
 Hierarchical Clustering</a>
 <ul>
@@ -91,7 +89,6 @@ Analysis</a></li>
 <li><a href="#k-means-on-pc-scores" id="toc-k-means-on-pc-scores">K-Means on PC Scores</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#interpretation" id="toc-interpretation">Interpretation</a></li>
 <li><a href="#conclusion" id="toc-conclusion">Conclusion</a></li>
 </ul>
 </div>
@@ -155,7 +152,7 @@ describe how the groups differ from one another.</p>
 <p>Figure 1 and Table 1 present the boxplot and summary statistics
 (respectively) of each variable from the original dataset. There are no
 missing data, the variables are not on same scale, and each variable
-contains at least one outlier. The summaries also show that the variance
+contains at least one outlier. The summary also shows that the variance
 of <code>GDP</code> differs substantially from the other variables. As
 such, the data was standardized before performing the cluster analysis
 so that each variable has a mean of zero and standard deviation (Std
@@ -263,7 +260,7 @@ Figure 2. Bivariate Scatter Plot.
 <p>All bivariate relationships are summarized in Table 3. The strongest
 positive correlations are between <code>GDP</code> versus
 <code>Support</code> &amp; <code>Healthy</code>. Indicating that
-countries with higher GDPs usually have more people with social
+countries with higher (log) GDPs usually have people with more social
 structures of support among friends &amp; relatives; and citizens from
 higher GDP countries tend to have a higher life expectancy.
 <code>Freedom</code> is moderately correlated with most variables.
@@ -320,10 +317,6 @@ other indicators of happiness).</p>
 </table>
 <p></font></p>
 </div>
-</div>
-<div id="assumptions" class="section level1">
-<h1>Assumptions</h1>
-<p>The Euclidean distance is for each cluster analysis method.</p>
 </div>
 <div id="agglomerative-hierarchical-clustering" class="section level1">
 <h1>Agglomerative Hierarchical Clustering</h1>
@@ -431,15 +424,15 @@ analysis.</p>
 <p>Since several variables are correlated with one another, the typical
 measures used to evaluate different k-means clustering models, i.e., the
 Cubic Clustering Criterion (CCC) and Approximate Expected Overall
-R<sup>2</sup>, cannot be used. To use them, a principal component
-analysis (PCA) must be performed to obtain orthogonal axes before using
-the k-means algorithm.</p>
+R<sup>2</sup>, cannot be used <a href="https://documentation.sas.com/doc/en/statcdc/14.2/statug/statug_fastclus_syntax01.htm">source</a>.
+To use them, a principal component analysis (PCA) must be performed to
+obtain orthogonal axes before using the k-means algorithm.</p>
 <div id="principal-component-analysis" class="section level3">
 <h3>Principal Component Analysis</h3>
 <p>PCA is a feature engineering technique used to reduce the
 dimensionality of a dataset while minimizing information loss. It does
 so by creating new set of uncorrelated variables that successively
-maximize variance of the original dataset.</p>
+maximize the variance of the original dataset.</p>
 <p>PCA Steps:</p>
 <ol style="list-style-type: decimal">
 <li>Compute the correlation matrix of the observational data (see
@@ -450,12 +443,13 @@ Table/Figure 2).</li>
 </ol>
 <p>The Kaiser rule indicates to retain principal component (PCs) whose
 eigenvalues are greater than one. In this case, the eigenvalues of the
-first two components are larger than one. In the scree plot (Figure 5),
-the “elbow” is located at the position of the second largest eigenvalue,
-also suggesting the first two components should be extracted. The
-largest component explains 50.67% of the total variance in the data, and
-the second largest component 19.72%. In total, 70.39% of the total
-variance in the data can be explained by the two components.</p>
+first two components are larger than one (Table 4). In the scree plot
+(Figure 5), the “elbow” is located at the position of the second largest
+eigenvalue, also suggesting the first two components should be
+extracted. The largest component explains 50.67% of the total variance
+in the data, and the second largest component 19.72%. In total, 70.39%
+of the total variance in the data can be explained by the two
+components.</p>
 <pre><code>PROC PRINCOMP DATA=dataset_std OUT=dataset_PCA;
     VAR GDP Support Healthy Freedom Generosity Corruption;
 RUN;</code></pre>
@@ -481,9 +475,10 @@ determined a priori.</p>
 <ol style="list-style-type: decimal">
 <li>k datapoints from the dataset are selected at random as the initial
 centroids of each cluster.</li>
-<li>Each data point is then assigned to the closest cluster (centroid)
-and the centroid of each cluster is recalculated.</li>
-<li>Step 2 is repeated until no more reassignments are made.</li>
+<li>Each data point is then assigned to the closest cluster
+(centroid)</li>
+<li>The centroid of each cluster is recalculated.</li>
+<li>Step 2 and 3 are repeated until no more reassignments are made.</li>
 </ol>
 <p>The PC scores of the first 2 components of the PCA are used to run
 the k-means algorithm. Below, <code>PROC FASTCLUS</code> procedure is
@@ -500,12 +495,8 @@ one can specify a minimum distance that any two centriods must be
 separated by. Radii larger than 3 proved to be too large for the data as
 it reduces the maximum number of clusters to 3 or 4 and produced
 evaluation statistics plots that converged too quickly. Hence, radii of
-0 to 2 were evaluated.</p>
-<ul>
-<li>A radius of 2 reduced the maximum number of clusters to 7 or 8</li>
-<li>A radius of 1 reduced the maximum number of clusters to 5 or 8</li>
-<li>A radius of 0 reduced the maximum number of clusters to 7 or 9</li>
-</ul>
+0 to 2 were evaluated and a radius of 0 was selected since its
+evaluation statistics plots appeared the most stable.</p>
 <pre><code>%MACRO doFASTCLUS;
     %DO k=2 %TO 20;
     
@@ -577,15 +568,16 @@ k-means algorithm.</p>
 </div>
 </div>
 </div>
-<div id="interpretation" class="section level1">
-<h1>Interpretation</h1>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
 <p>Given all the competing solutions, the k-means algorithm with radius
 = 0 and k = 7 was selected as the final solution as it performs better
 for all the evaluation statistics and provides logical and
 straightforward clustering. The clusters are interpreted based on their
 mean scores, particularly the scores that appear to be different from
 the other clusters. One can explore the results of this cluster analysis
-solution in the dashboard below.</p>
+solution in the dashboard below. The two PCs are used to visualize the
+clusters in 2D space.</p>
 <p>With a solution of 7 clusters, the countries can be grouped as
 follows:</p>
 <ul>
@@ -595,16 +587,12 @@ not very generous.</li>
 but a lot of corruption.</li>
 <li>Cluster 3 – Very free and generous.</li>
 <li>Cluster 4 – Not very generous</li>
-<li>Cluster 5 – Low GDP, support, and not very healthy</li>
+<li>Cluster 5 – Low GDP and support; not very healthy</li>
 <li>Cluster 6 – Very healthy and free.</li>
 <li>Cluster 7 – Low GDP, support, freedom, and not very healthy</li>
 </ul>
 <iframe src="https://public.tableau.com/views/WHR_Cluster_Analysis_KM/Dashboard?:language=en-US&amp;:display_count=n&amp;:origin=viz_share_link&amp;:showVizHome=no&amp;:embed=true" width="100%" height="800px" data-external="1">
 </iframe>
-</div>
-<div id="conclusion" class="section level1">
-<h1>Conclusion</h1>
-<p>Discuss which model chosen and why</p>
 </div>
 </section>
 
